@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fourplus/sade.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,15 +34,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  Profile profile = Profile(name: 2, fit: BoxFit.fill);
+  var size = Size(300, 200);
 
 
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.grey[400],
-        body: Column(
+        body: ListView(
           children: [
             Container(
               height: 60,
@@ -50,27 +52,36 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Draggable<Profile>(
-                      data: Profile(name: 1, fit: BoxFit.none),
+                      data: Profile(name: "1", dx: 0, dy: 0, isVertical: true ),
                       feedback: Image.asset('assets/1.png', height: 30,),
-                      child: Image.asset('assets/1.png', height: 30,),),
-                  const SizedBox(
-                    width: 20,
-                  ),Draggable<Profile>(
-                      data: Profile(name: 2, fit: BoxFit.fill),
-                      feedback: Image.asset('assets/2.png', height: 30,),
-                      child: Image.asset('assets/2.png', height: 30,),),
+                      child: Image.asset('assets/1.png', height: 30, width: 30,),),
                   const SizedBox(
                     width: 20,
                   ),
                   Draggable<Profile>(
-                      data: Profile(name: 3, fit: BoxFit.fill),
-                      feedback: Image.asset('assets/3.png', height: 30,),
-                      child: Image.asset('assets/3.png', height: 30,))
+                    data: Profile(name: "1", dx: 0, dy: 0, isVertical: false ),
+                    feedback: RotatedBox(
+                        quarterTurns: 1,child: Image.asset('assets/1.png', height: 30,)),
+                    child: RotatedBox(
+                        quarterTurns: 1,
+                        child: Image.asset('assets/1.png', height: 30, width: 30,)),),
+
+                    // Draggable<Profile>(
+                  //     data: Profile(name: 2, fit: BoxFit.fill),
+                  //     feedback: Image.asset('assets/2.png', height: 30,),
+                  //     child: Image.asset('assets/2.png', height: 30,),),
+                  // const SizedBox(
+                  //   width: 20,
+                  // ),
+                  // Draggable<Profile>(
+                  //     data: Profile(name: 3, fit: BoxFit.fill),
+                  //     feedback: Image.asset('assets/3.png', height: 30,),
+                  //     child: Image.asset('assets/3.png', height: 30,))
                 ],
               ),
             ),
             const SizedBox(height: 200,),
-            const TargetWidget(type: 1)
+            TargetWidget(type: 1, size: size,)
           ],
         ),
       ),
@@ -78,9 +89,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class TargetWidget extends StatefulWidget {
-  const TargetWidget({required this.type, super.key});
 
+class TargetWidget extends StatefulWidget {
+  const TargetWidget({required this.type, required this.size, super.key});
+
+  final Size size;
   final int type;
 
   @override
@@ -89,76 +102,60 @@ class TargetWidget extends StatefulWidget {
 
 class _TargetWidgetState extends State<TargetWidget> {
 
-  Profile profile  = Profile(name: 2, fit: BoxFit.fill);
-
-  double height= 500;
-  double width= 200;
-  double ratio = 1;
-  int sizeScale = 8;
+  List<DragTargetDetails<Profile>> myList = [];
 
   @override
   Widget build(BuildContext context) {
+    // var myList = [
+    //   Profile(name: "1", dx: 0, dy: 0, isVertical: true,),
+    //   Profile(name: "1", dx: widget.size.width /2, dy: 50, isVertical: false,),
+    // ];
 
-    if(width > height){
-      ratio = width / height;
-    }else{
-      ratio = height / width;
-    }
+    return Column(
+      children: [
+        Container(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(onPressed: (){
+                myList.removeLast();
+              }, icon: const Icon(Icons.undo)),
+              IconButton(onPressed: (){
+              }, icon: const Icon(Icons.redo))
+            ],
+          ),
+        ),
+        Text("${myList.length}"),
+        Stack(
+          children: [
 
-    return DragTarget<Profile>(
-        onAccept: (data) => setState(() {
+            Sade(width: widget.size.width, height: widget.size.height, data: myList),
+            DragTarget<Profile>(
+                onAcceptWithDetails: (data) {
+                  myList.add(data);
+                  setState(() {
 
-          profile = data;
-        }),
-        builder: (c, _, __) {
-          return Container(
-            height: height,
-            width: width,
-            decoration: const BoxDecoration(
-                image: DecorationImage(image: AssetImage("assets/glass.png"), fit: BoxFit.fill)
-            ),
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: [
-                Align(
-                    alignment: Alignment.centerLeft,
-                    child: Image.asset('assets/left.png', fit: BoxFit.fill, width: ratio * sizeScale, height: height)),
-                Align(
-                    alignment: Alignment.centerRight,
-                    child: Image.asset('assets/right.png', fit: BoxFit.fill, width: ratio * sizeScale, height: height,)),
-                Align(
-                    alignment: Alignment.topCenter,
-                    child: Image.asset('assets/top.png', fit: BoxFit.fill, height: ratio * sizeScale, width: width)),
-                Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Image.asset('assets/bottom.png', fit: BoxFit.fill, height: ratio * sizeScale, width: width)),
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: Image.asset('assets/topLeft.png', fit: BoxFit.contain, height: ratio * sizeScale, width: ratio * sizeScale)),
-                 Align(
-                    alignment: Alignment.topRight,
-                    child: Image.asset('assets/topRight.png', fit: BoxFit.contain, height: ratio * sizeScale, width: ratio * sizeScale)),
-                 Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Image.asset('assets/bottomLeft.png', fit: BoxFit.contain, height: ratio * sizeScale, width: ratio * sizeScale)),
-                Align(
-                    alignment: Alignment.bottomRight,
-                    child: Image.asset('assets/bottomRight.png', fit: BoxFit.contain, height: ratio * sizeScale, width: ratio * sizeScale)),
-                if(profile.name == 1) Align(
-                    alignment: Alignment.center, child: Image.asset('assets/1.png', fit: BoxFit.fitHeight, ))
-              ],
-            ),
-          );
-        });
+                  });
+                },
+                builder: (c, _, __) {
+                  return Container(width: widget.size.width, height: widget.size.height, color: Colors.transparent,);
+                }),
+          ],
+        ),
+      ],
+    );
   }
 }
 
 
 
 class Profile{
-  int name;
-  BoxFit fit;
+  String name;
+  double dx;
+  double dy;
+  bool isVertical;
 
-  Profile({required this.name, required this.fit});
+  Profile({required this.name, required this.dx, required this.dy, required this.isVertical});
 }
 
