@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:fourplus/main.dart';
 
@@ -78,7 +80,7 @@ class MyPainter extends CustomPainter {
           data[i].fixed = true;
         }
       }else {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(edge.left, edge.top + edge.bottom / 2), end: Offset(edge.right, edge.top + edge.bottom / 2));
+          drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2), end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
 
           // if(data[i].offset.dx < (size.width - edge.right!)) {
           //   drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(0 ,size.height - edge.right!,), end: Offset(size.width - edge.right!, size.height - edge.right!));
@@ -86,6 +88,11 @@ class MyPainter extends CustomPainter {
           //   drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(size.width - edge.right! , size.height - edge.right!), end: Offset(size.width , size.height - edge.right!));
           // }
           data[i].offset = Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
+          if(!data[i].fixed) {
+            data[i].offset = Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+            data[i].edge = edge;
+            data[i].fixed = true;
+          }
         }
 
     }
@@ -191,6 +198,17 @@ class MyPainter extends CustomPainter {
       canvas.drawLine(vp3, vp2, paint);  // خطوط مورب
       canvas.drawLine(vp7, vp6, paint);  // خطوط مورب
       canvas.drawLine(vp4, vp5, paint);  // خطوط مورب
+
+      final ParagraphBuilder paragraphBuilder = ParagraphBuilder(
+          ParagraphStyle(
+            fontSize:   8,
+            height: 10
+          )
+      )..addText("");
+      final Paragraph paragraph = paragraphBuilder.build()
+        ..layout(ParagraphConstraints(width: 12));
+
+      canvas.drawParagraph(paragraph, end);
 
     } else{
 
