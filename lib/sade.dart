@@ -10,7 +10,7 @@ class Sade extends StatefulWidget {
 
   final double height;
   final double width;
-  final List<DragTargetDetails<Profile>> data;
+  final List<MyDragTargetDetails<Profile>> data;
 
   @override
   State<Sade> createState() => _SadeState();
@@ -31,7 +31,7 @@ class MyPainter extends CustomPainter {
 
   double ratio = 1;
   int sizeScale = 8;
-  final List<DragTargetDetails<Profile>> data;
+  List<MyDragTargetDetails<Profile>> data;
   var z1 = 0.0;
   var z2 = 0.0;
 
@@ -54,26 +54,43 @@ class MyPainter extends CustomPainter {
     drawAroud(canvas, size, paint);
 
     for (var i = 0; i < data.length; i++) {
-      if (i == 0) {
-        if (data[i].data.isVertical) {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(size.width, 0), end: Offset(size.width, size.height));
-        } else {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(0 ,size.height/2,), end: Offset(size.width, size.height/2));
-        }
-      } else {
-        if (data[i].data.isVertical) {
-          // drawSplitter(canvas, paint, data[i].data.isVertical, start: size.width, end: size.height - data[i].data.dy,);
 
-          // drawSplitter(canvas, paint, data[i].data.isVertical, start: Offset(size.width/2, 0 ), end: Offset(size.width/2, size.height /2));
-        }else {
-          if(data[i].offset.dx < (size.width / 2)) {
-            drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(0 ,size.height/2,), end: Offset(size.width/2, size.height /2));
-          } else {
-            drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(size.width /2 , size.height/2), end: Offset(size.width , size.height/2));
-          }
+        var offsets = <Offset>[Offset(size.width, size.height)];
+        offsets.addAll(data.map((e) => e.offset).toList());
+        offsets.removeLast();
+        var edge;
+        if(!data[i].fixed) {
+          edge = findEdges(offsets, data[i].offset);
+        } else {
+          edge = data[i].edge!;
         }
-      }
+
+        if (data[i].data.isVertical) {
+          drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(edge.left + (edge.right - edge.left) / 2, edge.top ), end: Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom));
+          // if(data[i].offset.dy < (size.height - edge.right!)) {
+          //   drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(size.width - edge.right!, 0 ), end: Offset(size.width - edge.right!, size.height - edge.right!));
+          // } else {
+          //   drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(size.width - edge.right!,  size.height - edge.right! ), end: Offset(size.width - edge.right!, size.height));
+          // }
+          if(!data[i].fixed) {
+          data[i].offset = Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+          data[i].edge = edge;
+          data[i].fixed = true;
+        }
+      }else {
+          drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(edge.left, edge.top + edge.bottom / 2), end: Offset(edge.right, edge.top + edge.bottom / 2));
+
+          // if(data[i].offset.dx < (size.width - edge.right!)) {
+          //   drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(0 ,size.height - edge.right!,), end: Offset(size.width - edge.right!, size.height - edge.right!));
+          // } else {
+          //   drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(size.width - edge.right! , size.height - edge.right!), end: Offset(size.width , size.height - edge.right!));
+          // }
+          data[i].offset = Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
+        }
+
     }
+
+
   }
 
   @override
@@ -127,15 +144,26 @@ class MyPainter extends CustomPainter {
 
 
     if(isVertical) {
+      var topEdg = true;
+      var bottomEdge = true;
 
-    var vp1 = Offset((start.dx / 2 - z1 / 2), start.dy + z1);
-    var vp2 = Offset((start.dx / 2 + z1 / 2), start.dy + z1);
-    var vp3 = Offset((start.dx / 2 + (z2 - (z1 / 2))), z2);
-    var vp4 = Offset((end.dx / 2 + (z2 - (z1 / 2))), end.dy - z2);
-    var vp5 = Offset((end.dx / 2 + z1 / 2), end.dy - z1);
-    var vp6 = Offset((end.dx / 2 - z1 / 2), end.dy - z1);
-    var vp7 = Offset((end.dx / 2 - (z2 - (z1 / 2))), end.dy - z2);
-    var vp8 = Offset((start.dx / 2 - (z2 - (z1 / 2))), z2);
+      if(start.dy == 0)
+        topEdg = true;
+      else topEdg = false;
+
+      if(end.dy == size.height)
+        bottomEdge = true;
+      else bottomEdge = false;
+
+
+    var vp1 = Offset((start.dx - z1 / 2), start.dy + (topEdg ? z1 : z1/2));
+    var vp2 = Offset((start.dx + z1 / 2), start.dy + (topEdg ? z1 : z1/2));
+    var vp3 = Offset((start.dx + (z2 - (z1 / 2))), start.dy + (z2 - (topEdg ? 0 : z1/2)));
+    var vp4 = Offset((end.dx + (z2 - (z1 / 2))), end.dy - (z2 - (bottomEdge ? 0 : z1/2)));
+    var vp5 = Offset((end.dx + z1 / 2), end.dy - (bottomEdge ? z1 : z1/2));
+    var vp6 = Offset((end.dx - z1 / 2), end.dy - (bottomEdge ? z1 : z1/2));
+    var vp7 = Offset((end.dx - (z2 - (z1 / 2))), end.dy - (z2 - (bottomEdge ? 0 : z1/2)));
+    var vp8 = Offset((start.dx - (z2 - (z1 / 2))), start.dy +(z2 - (topEdg ? 0 : z1/2)));
 
 
       path.moveTo(vp1.dx, vp1.dy);
@@ -177,33 +205,99 @@ class MyPainter extends CustomPainter {
         rightEdge = true;
       else rightEdge = false;
 
-      path.moveTo(start.dx+(leftEdg ? z1 : z1/2), (start.dy - z1 / 2));
-      path.lineTo(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy - (z2 - (z1 / 2))));
-      path.lineTo(end.dx - (z2) + (rightEdge ? 0 : z1/2), (end.dy - (z2 - (z1 / 2))));
-      path.lineTo(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy - z1 / 2));
-      path.lineTo(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy + z1 / 2));
-      path.lineTo(end.dx - (z2) + (rightEdge ? 0 : z1/2), (end.dy + (z2 - (z1 / 2))));
-      path.lineTo(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy + (z2 - (z1 / 2))));
-      path.lineTo(start.dx+(leftEdg ? z1: z1/2), (start.dy + z1 / 2));
+
+      var hp1 = Offset(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy - (z2 - (z1 / 2))));
+      var hp2 = Offset(end.dx - (z2) + (rightEdge ? 0 : z1/2), (end.dy - (z2 - (z1 / 2))));
+      var hp3 = Offset(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy - z1 / 2));
+      var hp4 = Offset(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy + z1 / 2));
+      var hp5 = Offset(end.dx - (z2) + (rightEdge ? 0 : z1/2), (end.dy + (z2 - (z1 / 2))));
+      var hp6 = Offset(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy + (z2 - (z1 / 2))));
+      var hp7 = Offset(start.dx+(leftEdg ? z1: z1/2), (start.dy + z1 / 2));
+      var hp8 = Offset(start.dx+(leftEdg ? z1 : z1/2), (start.dy - z1 / 2));
+
+
+      path.moveTo(hp1.dx, hp1.dy);
+      path.lineTo(hp2.dx, hp2.dy);
+      path.lineTo(hp3.dx, hp3.dy);
+      path.lineTo(hp4.dx, hp4.dy);
+      path.lineTo(hp5.dx, hp5.dy);
+      path.lineTo(hp6.dx, hp6.dy);
+      path.lineTo(hp7.dx, hp7.dy);
+      path.lineTo(hp8.dx, hp8.dy);
       path.close();
 
       paint2.color = Colors.green;
       canvas.drawPath(path, paint2);
 
+      canvas.drawLine(hp8, hp3, paint);
+      canvas.drawLine(hp7, hp4, paint);
+      canvas.drawLine(hp7, hp8, paint);
 
-      canvas.drawLine(Offset(start.dx+(leftEdg ? z1: z1/2), (start.dy - z1 / 2)), Offset(end.dx - (rightEdge ? z1 : z1/ 2), (end.dy - z1 / 2),), paint);
-      canvas.drawLine(Offset(start.dx+(leftEdg ? z1: z1/2), (start.dy + z1 / 2)), Offset(end.dx - (rightEdge ? z1 : z1/ 2), (end.dy + z1 / 2),), paint);
-      canvas.drawLine(Offset(start.dx+(leftEdg ? z1: z1/2), (start.dy - z1 / 2)), Offset(start.dx+(leftEdg ? z1 : z1/2), (start.dy + z1 / 2)), paint);
+      canvas.drawLine(hp1, hp2, paint);
+      canvas.drawLine(hp6, hp5, paint);
+      canvas.drawLine(hp3, hp4, paint);
 
-      canvas.drawLine(Offset(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy - (z2 - (z1 / 2)))), Offset(end.dx - (z2) + (rightEdge ? 0 : z1/2), (end.dy - (z2 - (z1 / 2)))), paint);
-      canvas.drawLine(Offset(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy + (z2 - (z1 / 2)))), Offset(end.dx - (z2) + (rightEdge ? 0 : z1/2), (end.dy + (z2 - (z1 / 2)))), paint);
-      canvas.drawLine(Offset(end.dx - (rightEdge ? z1 : z1 / 2 ), (end.dy - z1 / 2),), Offset(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy + z1 / 2),), paint);
-
-      canvas.drawLine(Offset(start.dx+(leftEdg ? z1: z1/2), (start.dy - z1 / 2)), Offset(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy - (z2 - (z1 / 2)))), paint);
-      canvas.drawLine(Offset(start.dx+(leftEdg ? z1: z1/2), (start.dy + z1 / 2)), Offset(start.dx + z2 - (leftEdg ? 0 : z1/2), (start.dy + (z2 - (z1 / 2)))), paint);
-
-      canvas.drawLine(Offset(end.dx - (z2) + (rightEdge ? 0 :z1/2), (end.dy - (z2 - (z1 / 2)))), Offset(end.dx - (rightEdge ? z1 : z1 /2), (end.dy - z1 / 2)), paint);
-      canvas.drawLine(Offset(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy + z1 / 2)), Offset(end.dx - (z2) + (rightEdge ? 0 : z1/2), (end.dy + (z2 - (z1 / 2)))), paint);
+      canvas.drawLine(hp8, hp1, paint);
+      canvas.drawLine(hp2, hp3, paint);
+      canvas.drawLine(hp5, hp4, paint);
+      canvas.drawLine(hp6, hp7, paint);
     }
   }
+
+  Edges findEdges(List<Offset> offsets, Offset targetOffset) {
+    double minDistanceTop = double.infinity;
+    double minDistanceBottom = double.infinity;
+    double minDistanceLeft = double.infinity;
+    double minDistanceRight = double.infinity;
+    double? topEdgeX;
+    double? topEdgeY;
+    double? bottomEdgeX;
+    double? bottomEdgeY;
+    double? leftEdgeX;
+    double? leftEdgeY;
+    double? rightEdgeX;
+    double? rightEdgeY;
+
+    for (Offset offset in offsets) {
+      double distanceX = offset.dx - targetOffset.dx;
+      double distanceY = offset.dy - targetOffset.dy;
+
+      if (distanceY > 0 && distanceY <= minDistanceTop) {
+        minDistanceTop = distanceY;
+        topEdgeX = offset.dx;
+        topEdgeY = offset.dy;
+      } else if (distanceY < 0 && -distanceY <= minDistanceBottom) {
+        minDistanceBottom = -distanceY;
+        bottomEdgeX = offset.dx;
+        bottomEdgeY = offset.dy;
+      }
+
+      if (distanceX > 0 && distanceX <= minDistanceRight) {
+        minDistanceRight = distanceX;
+        rightEdgeX = offset.dx;
+        rightEdgeY = offset.dy;
+      } else if (distanceX < 0 && -distanceX <= minDistanceLeft) {
+        minDistanceLeft = -distanceX;
+        leftEdgeX = offset.dx;
+        leftEdgeY = offset.dy;
+      }
+    }
+
+    return Edges(
+      top: bottomEdgeY ?? 0,
+      bottom: topEdgeY ?? 0,
+      left: leftEdgeX ?? 0,
+      right: rightEdgeX ?? 0,
+    );
+  }
 }
+
+class Edges {
+  double top;
+  double bottom;
+  double left;
+  double right;
+
+  Edges({required this.top, required this.bottom, required this.left, required this.right});
+}
+

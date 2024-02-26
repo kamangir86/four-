@@ -102,7 +102,7 @@ class TargetWidget extends StatefulWidget {
 
 class _TargetWidgetState extends State<TargetWidget> {
 
-  List<DragTargetDetails<Profile>> myList = [];
+  List<MyDragTargetDetails<Profile>> myList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -131,16 +131,16 @@ class _TargetWidgetState extends State<TargetWidget> {
           children: [
 
             Sade(width: widget.size.width, height: widget.size.height, data: myList),
-            DragTarget<Profile>(
-                onAcceptWithDetails: (data) {
-                  myList.add(data);
-                  setState(() {
+            MyDragTaget<Profile>(
+              size: widget.size,
+              onAcceptWithDetails: (data) {
+                myList.add(data);
+                setState(() {
 
-                  });
-                },
-                builder: (c, _, __) {
-                  return Container(width: widget.size.width, height: widget.size.height, color: Colors.transparent,);
-                }),
+                });
+              },
+            ),
+
           ],
         ),
       ],
@@ -148,7 +148,41 @@ class _TargetWidgetState extends State<TargetWidget> {
   }
 }
 
+class MyDragTaget<T extends Object> extends StatelessWidget {
+  const MyDragTaget({required this.size, this.onAcceptWithDetails, super.key});
 
+  final void Function(MyDragTargetDetails<T> details)? onAcceptWithDetails;
+  final Size size;
+
+  @override
+  Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
+    var height = MediaQuery.sizeOf(context).height;
+    return DragTarget<Profile>(
+        onAcceptWithDetails: (data) {
+          onAcceptWithDetails?.call(MyDragTargetDetails<T>(data: data.data as T, offset: Offset(data.offset.dx - ((width - size.width)/2), data.offset.dy - ((height - size.height)/2)), fixed: false));
+        },
+        builder: (c, _, __) {
+          return Container(width: size.width, height: size.height, color: Colors.transparent,);
+        });
+  }
+}
+
+class MyDragTargetDetails<T> {
+  /// Creates details for a [DragTarget] callback.
+  MyDragTargetDetails({required this.data, required this.offset, required this.fixed, this.edge});
+
+  /// The data that was dropped onto this [DragTarget].
+  final T data;
+
+  /// The global position when the specific pointer event occurred on
+  /// the draggable.
+  Offset offset;
+
+  Edges? edge;
+
+  bool fixed;
+}
 
 class Profile{
   String name;
