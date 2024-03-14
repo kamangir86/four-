@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -55,18 +56,37 @@ class MyPainter extends CustomPainter {
 
     drawAroud(canvas, size, paint);
 
+
+    // var offsets = <Offset>[Offset(size.width, size.height)];
+    //
+
+    List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
+
+    dataCopy.insertAll(0, [
+      MyDragTargetDetails<Profile>(data: Profile(name: '', isVertical: false), offset: Offset(size.width / 2, 0), fixed: true, start: const Offset(0,0), end: Offset(size.width, 0),),
+      MyDragTargetDetails<Profile>(data: Profile(name: '', isVertical: false), offset: Offset(size.width / 2, size.height), fixed: true, start: Offset(0,size.height), end: Offset(size.width, size.height),),
+      MyDragTargetDetails<Profile>(data: Profile(name: '', isVertical: true), offset: Offset(size.width / 2, 0), fixed: true, start: const Offset(0,0), end: Offset(0, size.height),),
+      MyDragTargetDetails<Profile>(data: Profile(name: '', isVertical: true), offset: Offset(size.width / 2, 0), fixed: true, start: Offset(size.width,0), end: Offset(size.width, size.height),),
+    ]);
+
+    // offsets.addAll(data.map((e) => e.offset).toList());
+    // offsets.removeLast();
+
     for (var i = 0; i < data.length; i++) {
 
-        var offsets = <Offset>[Offset(size.width, size.height)];
-        offsets.addAll(data.map((e) => e.offset).toList());
-        offsets.removeLast();
-        var edge;
-        if(!data[i].fixed) {
-          edge = findEdges(offsets, data[i].offset);
-        } else {
-          edge = data[i].edge!;
-        }
+        // var lines = <Line>[
+        //   Line(start: Offset(0,0), end: Offset(size.width, 0)),
+        //   Line(start: Offset(0,0), end: Offset(0, size.height)),
+        //   Line(start: Offset(size.width,0), end: Offset(size.width, size.height)),
+        //   Line(start: Offset(0,size.height), end: Offset(size.width, size.height)),
+        // ];
 
+      Edge edge;
+      if(!data[i].fixed) {
+        edge = findDrawableEdges(dataCopy);
+      } else {
+        edge = data[i].edge!;
+      }
         if (data[i].data.isVertical) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(edge.left + (edge.right - edge.left) / 2, edge.top ), end: Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom));
           // if(data[i].offset.dy < (size.height - edge.right!)) {
@@ -78,6 +98,8 @@ class MyPainter extends CustomPainter {
           data[i].offset = Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
           data[i].edge = edge;
           data[i].fixed = true;
+          data[i].start = Offset(edge.left + (edge.right - edge.left) / 2, edge.top );
+          data[i].end = Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
         }
       }else {
           drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2), end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
@@ -87,11 +109,12 @@ class MyPainter extends CustomPainter {
           // } else {
           //   drawSplitter(canvas, paint, data[i].data.isVertical, size, start: Offset(size.width - edge.right! , size.height - edge.right!), end: Offset(size.width , size.height - edge.right!));
           // }
-          data[i].offset = Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
           if(!data[i].fixed) {
-            data[i].offset = Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+            data[i].offset = Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
             data[i].edge = edge;
             data[i].fixed = true;
+            data[i].start = Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
+            data[i].end = Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
           }
         }
 
@@ -262,7 +285,7 @@ class MyPainter extends CustomPainter {
     }
   }
 
-  Edges findEdges(List<Offset> offsets, Offset targetOffset) {
+  Edge findEdgesForLastOffset(List<Offset> offsets, Offset targetOffset) {
     double minDistanceTop = double.infinity;
     double minDistanceBottom = double.infinity;
     double minDistanceLeft = double.infinity;
@@ -280,7 +303,7 @@ class MyPainter extends CustomPainter {
       double distanceX = offset.dx - targetOffset.dx;
       double distanceY = offset.dy - targetOffset.dy;
 
-      if (distanceY > 0 && distanceY <= minDistanceTop) {
+      if ((distanceY > 0 && distanceY <= minDistanceTop) && (offset.dx<= minDistanceTop && targetOffset.dx <= offset.dx)) {
         minDistanceTop = distanceY;
         topEdgeX = offset.dx;
         topEdgeY = offset.dy;
@@ -290,7 +313,7 @@ class MyPainter extends CustomPainter {
         bottomEdgeY = offset.dy;
       }
 
-      if (distanceX > 0 && distanceX <= minDistanceRight) {
+      if ((distanceX > 0 && distanceX <= minDistanceRight) && offset.dy <= minDistanceRight) {
         minDistanceRight = distanceX;
         rightEdgeX = offset.dx;
         rightEdgeY = offset.dy;
@@ -301,21 +324,86 @@ class MyPainter extends CustomPainter {
       }
     }
 
-    return Edges(
+    return Edge(
       top: bottomEdgeY ?? 0,
       bottom: topEdgeY ?? 0,
       left: leftEdgeX ?? 0,
       right: rightEdgeX ?? 0,
     );
   }
+
+  Edge findDrawableEdges(List<MyDragTargetDetails<Profile>> allLines) {
+    double x = allLines.last.offset.dx;
+    double y = allLines.last.offset.dy;
+
+    double topEdge = double.infinity;
+    double bottomEdge = double.negativeInfinity;
+    double leftEdge = double.negativeInfinity;
+    double rightEdge = double.infinity;
+
+    List<MyDragTargetDetails<Profile>> lines = List.from(allLines);
+    lines.removeLast();
+
+    for (var line in lines) {
+      double startX = line.start!.dx;
+      double startY = line.start!.dy;
+      double endX = line.end!.dx;
+      double endY = line.end!.dy;
+
+      // Check for vertical lines
+      if (startY == endY && (x >= startX && x <= endX)) {
+        if (y >= startY && (x >= startX && x <= endX)) {
+          bottomEdge = max(bottomEdge, endY);
+        }
+        if (y <= endY && (x >= startX && x <= endX)) {
+          topEdge = min(topEdge, startY);
+        }
+      }
+
+      // Check for horizontal lines
+      if (startX == endX && (y >= startY && y <= endY)) {
+        if (x >= startX && (y >= startY && y <= endY)) {
+          leftEdge = max(leftEdge, startX);
+        }
+        if (x <= endX && (y >= startY && y <= endY)) {
+          rightEdge = min(rightEdge, endX);
+        }
+      }
+    }
+
+    // Adjust for the container edges
+    // topEdge = max(topEdge, 0);
+    // bottomEdge = min(bottomEdge, size.); // Change this to your container height
+    // leftEdge = max(leftEdge, 0);
+    // rightEdge = min(rightEdge, 100); // Change this to your container width
+
+
+    return Edge(
+    top: bottomEdge,
+        bottom: topEdge ,
+        left: leftEdge,
+        right: rightEdge
+    );
+  }
+
 }
 
-class Edges {
+
+
+
+class Edge {
   double top;
   double bottom;
   double left;
   double right;
 
-  Edges({required this.top, required this.bottom, required this.left, required this.right});
+  Edge({required this.top, required this.bottom, required this.left, required this.right});
+}
+
+class Line {
+  Offset? start;
+  Offset? end;
+
+  Line({required this.start, required this.end});
 }
 

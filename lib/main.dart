@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fourplus/sade.dart';
+import 'package:multi_split_view/multi_split_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -52,14 +53,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Draggable<Profile>(
-                      data: Profile(name: "1", dx: 0, dy: 0, isVertical: true ),
+                      data: Profile(name: "1", isVertical: true ),
                       feedback: Image.asset('assets/1.png', height: 30,),
                       child: Image.asset('assets/1.png', height: 30, width: 30,),),
                   const SizedBox(
                     width: 20,
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: "1", dx: 0, dy: 0, isVertical: false ),
+                    data: Profile(name: "1", isVertical: false ),
                     feedback: RotatedBox(
                         quarterTurns: 1,child: Image.asset('assets/1.png', height: 30,)),
                     child: RotatedBox(
@@ -81,7 +82,45 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             const SizedBox(height: 200,),
-            TargetWidget(type: 1, size: size,)
+            TargetWidget(type: 1, size: size,),
+            // SizedBox(
+            //   height: 600,
+            //   child: MultiSplitView(
+            //     children: [
+            //       Container(
+            //         height: 50,
+            //           width: 50,
+            //           color: Colors.red,
+            //           child: Text("1")),Container(
+            //         height: 50,
+            //           width: 50,
+            //           color: Colors.red,
+            //           child: Text("1")),Container(
+            //         height: 50,
+            //           width: 50,
+            //           color: Colors.red,
+            //           child: Text("1")),
+            //       MultiSplitView(
+            //         axis: Axis.vertical,
+            //         children: [
+            //           Container(
+            //               height: 50,
+            //               width: 50,
+            //               color: Colors.green,
+            //               child: Text("2")),Container(
+            //               height: 50,
+            //               width: 50,
+            //               color: Colors.green,
+            //               child: Text("2")),Container(
+            //               height: 50,
+            //               width: 50,
+            //               color: Colors.green,
+            //               child: Text("2")),
+            //         ],
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -170,7 +209,7 @@ class MyDragTaget<T extends Object> extends StatelessWidget {
 
 class MyDragTargetDetails<T> {
   /// Creates details for a [DragTarget] callback.
-  MyDragTargetDetails({required this.data, required this.offset, required this.fixed, this.edge});
+  MyDragTargetDetails({required this.data, required this.offset, required this.fixed, this.edge, this.start, this.end});
 
   /// The data that was dropped onto this [DragTarget].
   final T data;
@@ -179,17 +218,18 @@ class MyDragTargetDetails<T> {
   /// the draggable.
   Offset offset;
 
-  Edges? edge;
+  Offset? start;
+  Offset? end;
+
+  Edge? edge;
 
   bool fixed;
 }
 
 class Profile{
   String name;
-  double dx;
-  double dy;
   bool isVertical;
 
-  Profile({required this.name, required this.dx, required this.dy, required this.isVertical});
+    Profile({required this.name, required this.isVertical});
 }
 
