@@ -92,7 +92,7 @@ class TargetWidget extends StatefulWidget {
 
 class _TargetWidgetState extends State<TargetWidget> {
 
-  List<MyDragTargetDetails<Profile>> myList = [];
+  // List<MyDragTargetDetails<Profile>> myList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -101,42 +101,7 @@ class _TargetWidgetState extends State<TargetWidget> {
     //   Profile(name: "1", dx: widget.size.width /2, dy: 50, isVertical: false,),
     // ];
 
-    return Column(
-      children: [
-        SizedBox(
-          height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(onPressed: (){
-                myList.removeLast();
-                setState(() {
-
-                });
-              }, icon: const Icon(Icons.undo)),
-              IconButton(onPressed: (){
-              }, icon: const Icon(Icons.redo))
-            ],
-          ),
-        ),
-        Text("${myList.length}"),
-        Stack(
-          children: [
-            Sade(width: widget.size.width, height: widget.size.height, data: myList),
-            MyDragTaget<Profile>(
-              size: widget.size,
-              onAcceptWithDetails: (data) {
-                myList.add(data);
-                setState(() {
-
-                });
-              },
-            ),
-
-          ],
-        ),
-      ],
-    );
+    return Sade(width: widget.size.width, height: widget.size.height);
   }
 }
 
@@ -246,9 +211,13 @@ class MyDragTaget<T extends Object> extends StatelessWidget {
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
     var height = MediaQuery.sizeOf(context).height;
+
     return DragTarget<Profile>(
         onAcceptWithDetails: (data) {
-          onAcceptWithDetails?.call(MyDragTargetDetails<T>(data: data.data as T, offset: Offset(data.offset.dx - ((width - size.width)/2), data.offset.dy - ((height - size.height)/2)), fixed: false));
+          RenderBox box = key.currentContext!.findRenderObject() as RenderBox;
+          Offset position = box.localToGlobal(Offset.zero);
+
+          onAcceptWithDetails?.call(MyDragTargetDetails<T>(data: data.data as T, offset: Offset(data.offset.dx - (position.dx), data.offset.dy - (position.dy)), fixed: false));
         },
         builder: (c, _, __) {
           return Container(width: size.width, height: size.height, color: Colors.transparent,);

@@ -7,17 +7,15 @@ import 'package:fourplus/main.dart';
 
 ValueNotifier<List<double>> verticalSheetsSize = ValueNotifier<List<double>>([]);
 ValueNotifier<List<double>> horizontalSheetsSize = ValueNotifier<List<double>>([]);
-
+GlobalKey key = GlobalKey();
 class Sade extends StatefulWidget {
   const Sade(
       {required this.height,
       required this.width,
-      required this.data,
       super.key});
 
   final double height;
   final double width;
-  final List<MyDragTargetDetails<Profile>> data;
 
   @override
   State<Sade> createState() => _SadeState();
@@ -25,10 +23,12 @@ class Sade extends StatefulWidget {
 
 class _SadeState extends State<Sade> {
 
+  List<MyDragTargetDetails<Profile>> myList = [];
+
   @override
   Widget build(BuildContext context) {
 
-    var data = widget.data;
+    var data = List.of(myList);
     List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
 
     dataCopy.insertAll(0, [
@@ -98,39 +98,74 @@ class _SadeState extends State<Sade> {
     computeSizeOfSheets(data);
 
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+    return Column(
       children: [
-        Column(
-          children: [
-            ValueListenableBuilder<List<double>?>(
-              valueListenable: verticalSheetsSize,
-              builder: (BuildContext context, value, Widget? child) {
-                return VerticalSize(
-                  height: widget.height,
-                  splits: value, // [25, 25, 25, 25],
-                );
-              },
-            ),
-            const SizedBox(
-              height: 60,
-            )
-          ],
+        SizedBox(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(onPressed: (){
+                myList.removeLast();
+                setState(() {
+
+                });
+              }, icon: const Icon(Icons.undo)),
+              IconButton(onPressed: (){
+              }, icon: const Icon(Icons.redo))
+            ],
+          ),
         ),
-        Column(
+        Text("${myList.length}"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            CustomPaint(
-              painter: MyPainter(data: widget.data),
-              size: Size(widget.width, widget.height),
+            Column(
+              children: [
+                ValueListenableBuilder<List<double>?>(
+                  valueListenable: verticalSheetsSize,
+                  builder: (BuildContext context, value, Widget? child) {
+                    return VerticalSize(
+                      height: widget.height,
+                      splits: value, // [25, 25, 25, 25],
+                    );
+                  },
+                ),
+                const SizedBox(
+                  height: 60,
+                )
+              ],
             ),
-    ValueListenableBuilder<List<double>?>(
-              builder: (BuildContext context, List<double>? value, Widget? child) {
-                return HorizontalSize(
-                  width: widget.width,
-                  splits: value, // [150, 75,75],
-                );
-              }, valueListenable: horizontalSheetsSize,
-            )
+            Column(
+              children: [
+                Stack(
+                  children: [
+                    CustomPaint(
+                      key: key,
+                      painter: MyPainter(data: myList),
+                      size: Size(widget.width, widget.height),
+                    ),
+                    MyDragTaget<Profile>(
+                      size: Size( widget.width, widget.height),
+                      onAcceptWithDetails: (data) {
+                        myList.add(data);
+                        setState(() {
+
+                        });
+                      },
+                    ),
+                  ],
+                ),
+        ValueListenableBuilder<List<double>?>(
+                  builder: (BuildContext context, List<double>? value, Widget? child) {
+                    return HorizontalSize(
+                      width: widget.width,
+                      splits: value, // [150, 75,75],
+                    );
+                  }, valueListenable: horizontalSheetsSize,
+                )
+              ],
+            ),
           ],
         ),
       ],
