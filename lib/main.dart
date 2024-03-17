@@ -35,7 +35,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  var size = Size(300, 200);
+  var size = Size(300, 201);
 
 
   @override

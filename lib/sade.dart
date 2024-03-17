@@ -71,26 +71,31 @@ class _SadeState extends State<Sade> {
         edge = data[i].edge!;
       }
       if (data[i].data.isVertical) {
+
+        var point = (edge.left + (edge.right - edge.left) / 2).ceil();
+
         if (!data[i].fixed) {
           data[i].offset =
-              Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+              Offset(point.toDouble(), edge.bottom);
           data[i].edge = edge;
           data[i].fixed = true;
           data[i].start =
-              Offset(edge.left + (edge.right - edge.left) / 2, edge.top);
+              Offset(point.toDouble(), edge.top);
           data[i].end =
-              Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+              Offset(point.toDouble(), edge.bottom);
         }
       } else {
+
+        var point = (edge.top + (edge.bottom - edge.top) / 2).ceil();
         if (!data[i].fixed) {
           data[i].offset =
-              Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
+              Offset(edge.left, point.toDouble());
           data[i].edge = edge;
           data[i].fixed = true;
           data[i].start =
-              Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
+              Offset(edge.left, point.toDouble());
           data[i].end =
-              Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
+              Offset(edge.right, point.toDouble());
         }
       }
     }
