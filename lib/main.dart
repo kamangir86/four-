@@ -66,61 +66,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: RotatedBox(
                         quarterTurns: 1,
                         child: Image.asset('assets/1.png', height: 30, width: 30,)),),
-
-                    // Draggable<Profile>(
-                  //     data: Profile(name: 2, fit: BoxFit.fill),
-                  //     feedback: Image.asset('assets/2.png', height: 30,),
-                  //     child: Image.asset('assets/2.png', height: 30,),),
-                  // const SizedBox(
-                  //   width: 20,
-                  // ),
-                  // Draggable<Profile>(
-                  //     data: Profile(name: 3, fit: BoxFit.fill),
-                  //     feedback: Image.asset('assets/3.png', height: 30,),
-                  //     child: Image.asset('assets/3.png', height: 30,))
                 ],
               ),
             ),
             const SizedBox(height: 200,),
             TargetWidget(type: 1, size: size,),
-            // SizedBox(
-            //   height: 600,
-            //   child: MultiSplitView(
-            //     children: [
-            //       Container(
-            //         height: 50,
-            //           width: 50,
-            //           color: Colors.red,
-            //           child: Text("1")),Container(
-            //         height: 50,
-            //           width: 50,
-            //           color: Colors.red,
-            //           child: Text("1")),Container(
-            //         height: 50,
-            //           width: 50,
-            //           color: Colors.red,
-            //           child: Text("1")),
-            //       MultiSplitView(
-            //         axis: Axis.vertical,
-            //         children: [
-            //           Container(
-            //               height: 50,
-            //               width: 50,
-            //               color: Colors.green,
-            //               child: Text("2")),Container(
-            //               height: 50,
-            //               width: 50,
-            //               color: Colors.green,
-            //               child: Text("2")),Container(
-            //               height: 50,
-            //               width: 50,
-            //               color: Colors.green,
-            //               child: Text("2")),
-            //         ],
-            //       ),
-            //     ],
-            //   ),
-            // ),
+
           ],
         ),
       ),
@@ -152,13 +103,16 @@ class _TargetWidgetState extends State<TargetWidget> {
 
     return Column(
       children: [
-        Container(
+        SizedBox(
           height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(onPressed: (){
                 myList.removeLast();
+                setState(() {
+
+                });
               }, icon: const Icon(Icons.undo)),
               IconButton(onPressed: (){
               }, icon: const Icon(Icons.redo))
@@ -168,7 +122,6 @@ class _TargetWidgetState extends State<TargetWidget> {
         Text("${myList.length}"),
         Stack(
           children: [
-
             Sade(width: widget.size.width, height: widget.size.height, data: myList),
             MyDragTaget<Profile>(
               size: widget.size,
@@ -186,6 +139,102 @@ class _TargetWidgetState extends State<TargetWidget> {
     );
   }
 }
+
+class HorizontalSize extends StatelessWidget {
+  const HorizontalSize({required this.width, this.splits, super.key});
+  final double width;
+  final List<double>? splits;
+
+  @override
+  Widget build(BuildContext context) {
+
+    var sum = 0.0;
+    if(splits != null)
+    splits!.forEach((element) {
+      sum+=element;
+    });
+
+    return SizedBox(height: 60, width: width, child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if(splits != null) Expanded(
+          child: Row(
+            children: List.generate(splits!.length, (index) {
+
+              return Expanded(flex: ((splits![index]/sum) * 100).toInt(), child: SingleSize(width: splits![index]));
+            }),
+          ),
+        ),
+        const SizedBox(height: 4,),
+        SingleSize(width: width)
+      ],
+    ),);
+  }
+}
+class VerticalSize extends StatelessWidget {
+  const VerticalSize({required this.height, this.splits, super.key});
+  final double height;
+  final List<double>? splits;
+
+  @override
+  Widget build(BuildContext context) {
+    var sum = 0.0;
+    if(splits != null)
+      splits!.forEach((element) {
+        sum+=element;
+      });
+    return SizedBox(width: 60, height: height, child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SingleSize(height: height),
+        const SizedBox(width: 4,),
+        if(splits != null) Expanded(
+          child: Column(
+            children: List.generate(splits!.length, (index) {
+              return Expanded(flex: ((splits![index]/sum) * 100).toInt(), child: SingleSize(height: splits![index]));
+            }),
+          ),
+        ),
+      ],
+    ),);
+  }
+}
+
+class SingleSize extends StatelessWidget {
+  const SingleSize({this.width, this.height, super.key});
+  final double? width;
+  final double? height;
+  @override
+  Widget build(BuildContext context) {
+    var size = 0.0;
+
+    switch (width) {
+      case _?:
+        size = width!;
+      default:
+       size = height!;
+    }
+
+    return RotatedBox(
+      quarterTurns: width != null ? 0 : 3,
+      child: Row(
+        children: [
+          Container(color: Colors.black, height: 22, width: 1,),
+          Expanded(child: Container(color: Colors.black, height: 1,)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Text(size.toInt().toString()),
+          ),
+          Expanded(child: Container(color: Colors.black, height: 1,)),
+          Container(color: Colors.black, height: 22, width: 1,),
+        ],
+      ),
+    );
+  }
+}
+
 
 class MyDragTaget<T extends Object> extends StatelessWidget {
   const MyDragTaget({required this.size, this.onAcceptWithDetails, super.key});
