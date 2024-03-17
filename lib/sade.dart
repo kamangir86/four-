@@ -95,7 +95,7 @@ class _SadeState extends State<Sade> {
       }
     }
 
-    computeSizeOfSheets(data);
+    computeSizeOfSheets(data, Size(widget.width, widget.height));
 
 
     return Column(
@@ -214,7 +214,7 @@ class _SadeState extends State<Sade> {
         top: bottomEdge, bottom: topEdge, left: leftEdge, right: rightEdge);
   }
 
-  void computeSizeOfSheets(List<MyDragTargetDetails<Profile>> data) {
+  void computeSizeOfSheets(List<MyDragTargetDetails<Profile>> data, Size size) {
     List<double>? vSheetsSize;
     List<double>? hSheetsSize;
 
@@ -234,26 +234,58 @@ class _SadeState extends State<Sade> {
     vSheetsSize = [];
     hSheetsSize = [];
 
+    List<double> vDistances = [];
+    List<double> hDistances = [];
+
     if(hElement.isNotEmpty) {
       hElement.forEach((element) {
         vSheetsSize!.add(element.start!.dy);
       });
 
-      vSheetsSize.add(vSheetsSize.last);
-      vSheetsSize = vSheetsSize.reversed.toList();
+      vSheetsSize.sort();
+      vSheetsSize.insert(0, 0);
+      vSheetsSize.add(size.height);
+      List<double> uniqueNumbers = [];
+
+      for (var number in vSheetsSize) {
+        if (!uniqueNumbers.contains(number)) {
+          uniqueNumbers.add(number);
+        }
+      }
+
+      vSheetsSize = uniqueNumbers;
+
+      for (int i = 0; i < vSheetsSize.length - 1; i++) {
+        double distance = vSheetsSize[i + 1] - vSheetsSize[i];
+        vDistances.add(distance);
+      }
     }
     if(vElement.isNotEmpty) {
       vElement.forEach((element) {
         hSheetsSize!.add(element.start!.dx);
       });
 
-      hSheetsSize.add(hSheetsSize.last);
-      hSheetsSize = hSheetsSize.reversed.toList();
+      hSheetsSize.sort();
+      hSheetsSize.insert(0, 0);
+      hSheetsSize.add(size.width);
+      List<double> uniqueNumbers = [];
+
+      for (var number in hSheetsSize) {
+        if (!uniqueNumbers.contains(number)) {
+          uniqueNumbers.add(number);
+        }
+      }
+
+      hSheetsSize = uniqueNumbers;
+      for (int i = 0; i < hSheetsSize.length - 1; i++) {
+        double distance = hSheetsSize[i + 1] - hSheetsSize[i];
+        hDistances.add(distance);
+      }
     }
 
 
-    verticalSheetsSize = ValueNotifier(vSheetsSize);
-    horizontalSheetsSize = ValueNotifier(hSheetsSize);
+    verticalSheetsSize = ValueNotifier(vDistances);
+    horizontalSheetsSize = ValueNotifier(hDistances);
 
   }
 }
