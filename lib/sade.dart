@@ -8,8 +8,10 @@ import 'package:fourplus/main.dart';
 ValueNotifier<List<double>> verticalSheetsSize = ValueNotifier<List<double>>([]);
 ValueNotifier<List<double>> horizontalSheetsSize = ValueNotifier<List<double>>([]);
 GlobalKey key = GlobalKey();
-class Sade extends StatefulWidget {
-  const Sade(
+
+
+class ProfileMainWidget extends StatefulWidget {
+  const ProfileMainWidget(
       {required this.height,
       required this.width,
       super.key});
@@ -18,45 +20,46 @@ class Sade extends StatefulWidget {
   final double width;
 
   @override
-  State<Sade> createState() => _SadeState();
+  State<ProfileMainWidget> createState() => _ProfileMainWidgetState();
 }
 
-class _SadeState extends State<Sade> {
+class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
   List<MyDragTargetDetails<Profile>> myList = [];
+  List<MyDragTargetDetails<Profile>> data = [];
 
   @override
   Widget build(BuildContext context) {
 
-    var data = List.of(myList);
+    data = myList;
     List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
 
     dataCopy.insertAll(0, [
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(widget.width / 2, 0),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(widget.width, 0),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(widget.width / 2, widget.height),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: Offset(0, widget.height),
         end: Offset(widget.width, widget.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(widget.width / 2, 0),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(0, widget.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(widget.width / 2, 0),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: Offset(widget.width, 0),
         end: Offset(widget.width, widget.height),
       ),
@@ -74,7 +77,7 @@ class _SadeState extends State<Sade> {
 
         var point = (edge.left + (edge.right - edge.left) / 2).ceil();
 
-        if (!data[i].fixed) {
+        if (!data[i].fixed && !data[i].changedOffset) {
           data[i].offset =
               Offset(point.toDouble(), edge.bottom);
           data[i].edge = edge;
@@ -87,7 +90,7 @@ class _SadeState extends State<Sade> {
       } else {
 
         var point = (edge.top + (edge.bottom - edge.top) / 2).ceil();
-        if (!data[i].fixed) {
+        if (!data[i].fixed && !data[i].changedOffset) {
           data[i].offset =
               Offset(edge.left, point.toDouble());
           data[i].edge = edge;
@@ -133,6 +136,9 @@ class _SadeState extends State<Sade> {
                     return VerticalSize(
                       height: widget.height,
                       splits: value, // [25, 25, 25, 25],
+                      onChangeSize: (int newValue, int index) {
+                        changeSizeOfSheet(index, newValue, axis: Axis.horizontal);
+                      },
                     );
                   },
                 ),
@@ -154,9 +160,7 @@ class _SadeState extends State<Sade> {
                       size: Size( widget.width, widget.height),
                       onAcceptWithDetails: (data) {
                         myList.add(data);
-                        setState(() {
-
-                        });
+                        setState(() {});
                       },
                     ),
                   ],
@@ -166,6 +170,9 @@ class _SadeState extends State<Sade> {
                     return HorizontalSize(
                       width: widget.width,
                       splits: value, // [150, 75,75],
+                      onChangeSize: (int newValue, int index) {
+                        changeSizeOfSheet(index, newValue, axis: Axis.vertical,);
+                      },
                     );
                   }, valueListenable: horizontalSheetsSize,
                 )
@@ -176,6 +183,7 @@ class _SadeState extends State<Sade> {
       ],
     );
   }
+
   Edge findDrawableEdges(List<MyDragTargetDetails<Profile>> allLines) {
     double x = allLines.last.offset.dx;
     double y = allLines.last.offset.dy;
@@ -229,7 +237,6 @@ class _SadeState extends State<Sade> {
 
     data.forEach((element) {
       if(element.data.isVertical){
-        // hori size
         vElement.add(element);
       } else {
         hElement.add(element);
@@ -265,6 +272,7 @@ class _SadeState extends State<Sade> {
         vDistances.add(distance);
       }
     }
+
     if(vElement.isNotEmpty) {
       vElement.forEach((element) {
         hSheetsSize!.add(element.start!.dx);
@@ -292,6 +300,63 @@ class _SadeState extends State<Sade> {
     verticalSheetsSize = ValueNotifier(vDistances);
     horizontalSheetsSize = ValueNotifier(hDistances);
 
+  }
+
+  void changeSizeOfSheet(int index, int newValue, { required Axis axis}){
+
+
+    // horizontalSheetsSize = ValueNotifier(hDistances);
+
+    if(axis == Axis.horizontal){ //مجموع را از اول تا اندکس
+      var sum = 0.0;
+      var sumBefore = 0.0;
+
+      for(int i = 0; i <= index; i++){
+        sum += verticalSheetsSize.value[i];
+      }
+
+      for (int i = 0; i < data.length; i++) {
+        if(!data[i].data.isVertical){
+          if(data[i].start!.dy == sum){
+            data[i].start = Offset(data[i].start!.dx, newValue.toDouble());
+            data[i].offset = Offset(data[i].offset.dx, newValue.toDouble());
+            data[i].end = Offset(data[i].end!.dx, newValue.toDouble());
+            data[i].changedOffset = true;
+          }
+        }
+      }
+      // for (int i = 0; i < data.length; i++) {
+      //     if(data[i].edge!.bottom == sum || data[i].edge!.top == sum){
+      //       data[i].fixed = false;
+      //     }
+      // }
+    }
+    if(axis == Axis.vertical){ //مجموع را از اول تا اندکس
+      var sum = 0.0;
+      var sumBefore = 0.0;
+
+      for(int i = 0; i <= index; i++){
+        sum += horizontalSheetsSize.value[i];
+      }
+
+      for (int i = 0; i < data.length; i++) {
+        if(data[i].data.isVertical){
+          if(data[i].start!.dx == sum){
+            data[i].start = Offset( newValue.toDouble(), data[i].start!.dy);
+            data[i].offset = Offset(newValue.toDouble(), data[i].offset.dy);
+            data[i].end = Offset(newValue.toDouble(), data[i].end!.dy);
+            data[i].changedOffset = true;
+          }
+        }
+      }
+      // for (int i = 0; i < data.length; i++) {
+      //     if(data[i].edge!.right == sum || data[i].edge!.left == sum){
+      //       data[i].fixed = false;
+      //     }
+      // }
+    }
+
+    setState(() {});
   }
 }
 
@@ -328,28 +393,28 @@ class MyPainter extends CustomPainter {
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(size.width / 2, 0),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(size.width, 0),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(size.width / 2, size.height),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: Offset(0, size.height),
         end: Offset(size.width, size.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(size.width / 2, 0),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(0, size.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(size.width / 2, 0),
-        fixed: true,
+        fixed: true, changedOffset: false,
         start: Offset(size.width, 0),
         end: Offset(size.width, size.height),
       ),
@@ -360,35 +425,47 @@ class MyPainter extends CustomPainter {
       edge = data[i].edge!;
 
       if (data[i].data.isVertical) {
-        drawSplitter(canvas, paint, data[i].data.isVertical, size,
-            start: Offset(edge.left + (edge.right - edge.left) / 2, edge.top),
-            end: Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom));
 
-        if (!data[i].fixed) {
-          data[i].offset =
-              Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
-          data[i].edge = edge;
-          data[i].fixed = true;
-          data[i].start =
-              Offset(edge.left + (edge.right - edge.left) / 2, edge.top);
-          data[i].end =
-              Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+        if(data[i].changedOffset){
+          drawSplitter(canvas, paint, data[i].data.isVertical, size,
+              start: Offset(data[i].offset.dx, edge.top),
+              end: Offset(data[i].offset.dx, edge.bottom));
+        } else {
+          drawSplitter(canvas, paint, data[i].data.isVertical, size,
+              start: Offset(edge.left + (edge.right - edge.left) / 2, edge.top),
+              end: Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom));
         }
+        // if (!data[i].fixed) {
+        //   data[i].offset =
+        //       Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+        //   data[i].edge = edge;
+        //   data[i].fixed = true;
+        //   data[i].start =
+        //       Offset(edge.left + (edge.right - edge.left) / 2, edge.top);
+        //   data[i].end =
+        //       Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
+        // }
       } else {
-        drawSplitter(canvas, paint, data[i].data.isVertical, size,
-            start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2),
-            end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
-
-        if (!data[i].fixed) {
-          data[i].offset =
-              Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
-          data[i].edge = edge;
-          data[i].fixed = true;
-          data[i].start =
-              Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
-          data[i].end =
-              Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
+        if(data[i].changedOffset){
+          drawSplitter(canvas, paint, data[i].data.isVertical, size,
+              start: Offset(edge.left, data[i].offset.dy),
+              end: Offset(edge.right, data[i].offset.dy));
+        }else{
+          drawSplitter(canvas, paint, data[i].data.isVertical, size,
+              start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2),
+              end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
         }
+
+        // if (!data[i].fixed) {
+        //   data[i].offset =
+        //       Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
+        //   data[i].edge = edge;
+        //   data[i].fixed = true;
+        //   data[i].start =
+        //       Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
+        //   data[i].end =
+        //       Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
+        // }
       }
     }
   }

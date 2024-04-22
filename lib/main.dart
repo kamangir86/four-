@@ -101,14 +101,15 @@ class _TargetWidgetState extends State<TargetWidget> {
     //   Profile(name: "1", dx: widget.size.width /2, dy: 50, isVertical: false,),
     // ];
 
-    return Sade(width: widget.size.width, height: widget.size.height);
+    return ProfileMainWidget(width: widget.size.width, height: widget.size.height);
   }
 }
 
 class HorizontalSize extends StatelessWidget {
-  const HorizontalSize({required this.width, this.splits, super.key});
+  const HorizontalSize({required this.width, required this.splits, required this.onChangeSize, super.key});
   final double width;
   final List<double>? splits;
+  final Function(int, int) onChangeSize;
 
   @override
   Widget build(BuildContext context) {
@@ -127,20 +128,29 @@ class HorizontalSize extends StatelessWidget {
           child: Row(
             children: List.generate(splits!.length, (index) {
 
-              return Expanded(flex: ((splits![index]/sum) * 100).toInt(), child: SingleSize(width: splits![index]));
+              return Expanded(flex: ((splits![index]/sum) * 100).toInt(), child: SingleSize(width: splits![index], onchangeSize: (int? newValue){
+                print(newValue);
+                if(newValue != null) {
+                  onChangeSize(newValue, index);
+                }
+              }));
             }),
           ),
         ),
         const SizedBox(height: 4,),
-        SingleSize(width: width)
+        SingleSize(width: width, onchangeSize: (int? newValue){
+    print("notValid");
+    })
       ],
     ),);
   }
 }
+
 class VerticalSize extends StatelessWidget {
-  const VerticalSize({required this.height, this.splits, super.key});
+  const VerticalSize({required this.height, required this.splits, required this.onChangeSize, super.key});
   final double height;
   final List<double>? splits;
+  final Function(int, int) onChangeSize;
 
   @override
   Widget build(BuildContext context) {
@@ -153,12 +163,20 @@ class VerticalSize extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        SingleSize(height: height),
+        SingleSize(height: height, onchangeSize: (int? newValue){
+
+      print("not valid");
+    }),
         const SizedBox(width: 4,),
         if(splits != null) Expanded(
           child: Column(
             children: List.generate(splits!.length, (index) {
-              return Expanded(flex: ((splits![index]/sum) * 100).toInt(), child: SingleSize(height: splits![index]));
+              return Expanded(flex: ((splits![index]/sum) * 100).toInt(), child: SingleSize(height: splits![index], onchangeSize: (int? newValue){
+                print(newValue);
+                if(newValue != null) {
+                  onChangeSize(newValue, index);
+                }
+              }));
             }),
           ),
         ),
@@ -168,9 +186,10 @@ class VerticalSize extends StatelessWidget {
 }
 
 class SingleSize extends StatelessWidget {
-  const SingleSize({this.width, this.height, super.key});
+  const SingleSize({this.width, this.height, super.key, required this.onchangeSize});
   final double? width;
   final double? height;
+  final Function(int?) onchangeSize;
   @override
   Widget build(BuildContext context) {
     var size = 0.0;
@@ -184,17 +203,24 @@ class SingleSize extends StatelessWidget {
 
     return RotatedBox(
       quarterTurns: width != null ? 0 : 3,
-      child: Row(
-        children: [
-          Container(color: Colors.black, height: 22, width: 1,),
-          Expanded(child: Container(color: Colors.black, height: 1,)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Text(size.toInt().toString()),
-          ),
-          Expanded(child: Container(color: Colors.black, height: 1,)),
-          Container(color: Colors.black, height: 22, width: 1,),
-        ],
+      child: GestureDetector(
+        onTap: (){
+          showSizeDialog(size.toInt(), context, onchangeSize: (int? newValue){
+           onchangeSize(newValue);
+          });
+        },
+        child: Row(
+          children: [
+            Container(color: Colors.black, height: 22, width: 1,),
+            Expanded(child: Container(color: Colors.black, height: 1,)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              child: Text(size.toInt().toString()),
+            ),
+            Expanded(child: Container(color: Colors.black, height: 1,)),
+            Container(color: Colors.black, height: 22, width: 1,),
+          ],
+        ),
       ),
     );
   }
@@ -209,15 +235,13 @@ class MyDragTaget<T extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.sizeOf(context).width;
-    var height = MediaQuery.sizeOf(context).height;
 
     return DragTarget<Profile>(
         onAcceptWithDetails: (data) {
           RenderBox box = key.currentContext!.findRenderObject() as RenderBox;
           Offset position = box.localToGlobal(Offset.zero);
 
-          onAcceptWithDetails?.call(MyDragTargetDetails<T>(data: data.data as T, offset: Offset(data.offset.dx - (position.dx), data.offset.dy - (position.dy)), fixed: false));
+          onAcceptWithDetails?.call(MyDragTargetDetails<T>(data: data.data as T, offset: Offset(data.offset.dx - (position.dx), data.offset.dy - (position.dy)), fixed: false, changedOffset: false));
         },
         builder: (c, _, __) {
           return Container(width: size.width, height: size.height, color: Colors.transparent,);
@@ -227,7 +251,7 @@ class MyDragTaget<T extends Object> extends StatelessWidget {
 
 class MyDragTargetDetails<T> {
   /// Creates details for a [DragTarget] callback.
-  MyDragTargetDetails({required this.data, required this.offset, required this.fixed, this.edge, this.start, this.end});
+  MyDragTargetDetails({required this.data, required this.offset, required this.fixed, this.edge, this.start, this.end, required this.changedOffset});
 
   /// The data that was dropped onto this [DragTarget].
   final T data;
@@ -242,6 +266,7 @@ class MyDragTargetDetails<T> {
   Edge? edge;
 
   bool fixed;
+  bool changedOffset;
 }
 
 class Profile{
@@ -251,3 +276,115 @@ class Profile{
     Profile({required this.name, required this.isVertical});
 }
 
+showSizeDialog(int value, BuildContext context, {required Function(int?) onchangeSize}){
+  showDialog(context: context, builder: (c){
+    return Dialog(
+      alignment: Alignment.bottomCenter,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      child: SizedBox(
+        height: 400, width: MediaQuery.sizeOf(context).width * 0.95,
+        child: numPad(value, onchangeSize: onchangeSize),
+      ),
+    );
+  });
+}
+
+class numPad extends StatefulWidget {
+  const numPad(this.value, {super.key, required this.onchangeSize});
+  final int value;
+  final Function(int?) onchangeSize;
+
+  @override
+  State<numPad> createState() => _numPadState();
+}
+
+class _numPadState extends State<numPad> {
+  int? initValue;
+  int? newValue;
+
+  @override
+  void initState() {
+    initValue = widget.value;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 14),
+              child: Text(newValue == null ? (initValue == null ? "" : initValue.toString()) : newValue.toString(), style: TextStyle(fontSize: 30, color: initValue == null ? Colors.black : Colors.grey),),
+            )),
+            IconButton(onPressed: (){
+              removeLast();
+            }, icon: const Icon(Icons.backspace_sharp))
+          ],
+        ),
+        SizedBox(
+            height: 270,
+            child: GridView.count(
+          crossAxisSpacing: 1.5,
+          mainAxisSpacing: 1.5,
+          childAspectRatio: 5/3,
+            crossAxisCount: 3, children: [
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(1);}, child: const Text("1"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(2);}, child: const Text("2"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(3);}, child: const Text("3"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(4);}, child: const Text("4"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(5);}, child: const Text("5"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(6);}, child: const Text("6"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(7);}, child: const Text("7"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(8);}, child: const Text("8"))),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(9);}, child: const Text("9"))),
+          TextButton(onPressed: (){}, child: const SizedBox()),
+          Container(color: Colors.white, child: TextButton(onPressed: (){addToValue(0);}, child: const Text("0"))),
+          TextButton(onPressed: (){}, child: const SizedBox()),
+        ])),
+        Row(
+          children: [
+            TextButton(onPressed: (){
+              Navigator.of(context).pop();
+            }, child: Text("cancel")),
+            TextButton(onPressed: (){
+              widget.onchangeSize(newValue!);
+              Navigator.of(context).pop();
+            }, child: Text("ok"))
+          ],
+        )
+      ],
+    );
+  }
+
+  void addToValue(int i) {
+    initValue = null;
+    if(newValue != null) {
+      newValue = int.parse(newValue.toString() + i.toString());
+    } else {
+      newValue = i;
+    }
+    setState(() {
+
+    });
+  }
+
+  void removeLast() {
+
+    newValue ??= initValue;
+
+    var all = newValue.toString().split('');
+    if(all.length == 1) {
+      newValue = null;
+      initValue = null;
+    } else {
+      all.removeLast();
+      newValue = int.parse(all.join());
+    }
+
+    setState(() {
+
+    });
+  }
+}
