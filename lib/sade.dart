@@ -5,16 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fourplus/main.dart';
 
-ValueNotifier<List<double>> verticalSheetsSize = ValueNotifier<List<double>>([]);
-ValueNotifier<List<double>> horizontalSheetsSize = ValueNotifier<List<double>>([]);
+ValueNotifier<List<double>> verticalSheetsSize =
+    ValueNotifier<List<double>>([]);
+ValueNotifier<List<double>> horizontalSheetsSize =
+    ValueNotifier<List<double>>([]);
 GlobalKey key = GlobalKey();
-
 
 class ProfileMainWidget extends StatefulWidget {
   const ProfileMainWidget(
-      {required this.height,
-      required this.width,
-      super.key});
+      {required this.height, required this.width, super.key});
 
   final double height;
   final double width;
@@ -24,13 +23,11 @@ class ProfileMainWidget extends StatefulWidget {
 }
 
 class _ProfileMainWidgetState extends State<ProfileMainWidget> {
-
   List<MyDragTargetDetails<Profile>> myList = [];
   List<MyDragTargetDetails<Profile>> data = [];
 
   @override
   Widget build(BuildContext context) {
-
     data = myList;
     List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
 
@@ -38,73 +35,69 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(widget.width / 2, 0),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(widget.width, 0),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(widget.width / 2, widget.height),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: Offset(0, widget.height),
         end: Offset(widget.width, widget.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(widget.width / 2, 0),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(0, widget.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(widget.width / 2, 0),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: Offset(widget.width, 0),
         end: Offset(widget.width, widget.height),
       ),
     ]);
 
-
     for (var i = 0; i < data.length; i++) {
       Edge edge;
-      if (!data[i].fixed) {
-        edge = findDrawableEdges(dataCopy);
+      if (!data[i].fixed || data[i].changedOffset) {
+        edge = findDrawableEdges(dataCopy, data[i], i);
       } else {
         edge = data[i].edge!;
       }
+
+      data[i].edge = edge;
+
       if (data[i].data.isVertical) {
-
         var point = (edge.left + (edge.right - edge.left) / 2).ceil();
-
         if (!data[i].fixed && !data[i].changedOffset) {
           data[i].offset =
-              Offset(point.toDouble(), edge.bottom);
-          data[i].edge = edge;
+              Offset(point.toDouble(), edge.top + (edge.bottom - edge.top) / 2);
           data[i].fixed = true;
-          data[i].start =
-              Offset(point.toDouble(), edge.top);
-          data[i].end =
-              Offset(point.toDouble(), edge.bottom);
+          data[i].start = Offset(point.toDouble(), edge.top);
+          data[i].end = Offset(point.toDouble(), edge.bottom);
         }
       } else {
-
         var point = (edge.top + (edge.bottom - edge.top) / 2).ceil();
         if (!data[i].fixed && !data[i].changedOffset) {
-          data[i].offset =
-              Offset(edge.left, point.toDouble());
-          data[i].edge = edge;
+          data[i].offset = Offset(
+              edge.left + (edge.right - edge.left) / 2, point.toDouble());
           data[i].fixed = true;
-          data[i].start =
-              Offset(edge.left, point.toDouble());
-          data[i].end =
-              Offset(edge.right, point.toDouble());
+          data[i].start = Offset(edge.left, point.toDouble());
+          data[i].end = Offset(edge.right, point.toDouble());
         }
       }
     }
 
     computeSizeOfSheets(data, Size(widget.width, widget.height));
-
 
     return Column(
       children: [
@@ -113,14 +106,13 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(onPressed: (){
-                myList.removeLast();
-                setState(() {
-
-                });
-              }, icon: const Icon(Icons.undo)),
-              IconButton(onPressed: (){
-              }, icon: const Icon(Icons.redo))
+              IconButton(
+                  onPressed: () {
+                    myList.removeLast();
+                    setState(() {});
+                  },
+                  icon: const Icon(Icons.undo)),
+              IconButton(onPressed: () {}, icon: const Icon(Icons.redo))
             ],
           ),
         ),
@@ -137,7 +129,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                       height: widget.height,
                       splits: value, // [25, 25, 25, 25],
                       onChangeSize: (int newValue, int index) {
-                        changeSizeOfSheet(index, newValue, axis: Axis.horizontal);
+                        changeSizeOfSheet(index, newValue,
+                            axis: Axis.horizontal);
                       },
                     );
                   },
@@ -157,7 +150,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                       size: Size(widget.width, widget.height),
                     ),
                     MyDragTaget<Profile>(
-                      size: Size( widget.width, widget.height),
+                      size: Size(widget.width, widget.height),
                       onAcceptWithDetails: (data) {
                         myList.add(data);
                         setState(() {});
@@ -165,16 +158,22 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                     ),
                   ],
                 ),
-        ValueListenableBuilder<List<double>?>(
-                  builder: (BuildContext context, List<double>? value, Widget? child) {
+                ValueListenableBuilder<List<double>?>(
+                  builder: (BuildContext context, List<double>? value,
+                      Widget? child) {
                     return HorizontalSize(
                       width: widget.width,
                       splits: value, // [150, 75,75],
                       onChangeSize: (int newValue, int index) {
-                        changeSizeOfSheet(index, newValue, axis: Axis.vertical,);
+                        changeSizeOfSheet(
+                          index,
+                          newValue,
+                          axis: Axis.vertical,
+                        );
                       },
                     );
-                  }, valueListenable: horizontalSheetsSize,
+                  },
+                  valueListenable: horizontalSheetsSize,
                 )
               ],
             ),
@@ -184,9 +183,10 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     );
   }
 
-  Edge findDrawableEdges(List<MyDragTargetDetails<Profile>> allLines) {
-    double x = allLines.last.offset.dx;
-    double y = allLines.last.offset.dy;
+  Edge findDrawableEdges(List<MyDragTargetDetails<Profile>> allLines,
+      MyDragTargetDetails<Profile> target, int index) {
+    double x = target.offset.dx;
+    double y = target.offset.dy;
 
     double topEdge = double.infinity;
     double bottomEdge = double.negativeInfinity;
@@ -194,7 +194,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     double rightEdge = double.infinity;
 
     List<MyDragTargetDetails<Profile>> lines = List.from(allLines);
-    lines.removeLast();
+    lines.removeRange(index + 4, lines.length);
 
     for (var line in lines) {
       double startX = line.start!.dx;
@@ -234,9 +234,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     List<MyDragTargetDetails<Profile>> vElement = [];
     List<MyDragTargetDetails<Profile>> hElement = [];
 
-
     data.forEach((element) {
-      if(element.data.isVertical){
+      if (element.data.isVertical) {
         vElement.add(element);
       } else {
         hElement.add(element);
@@ -249,7 +248,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     List<double> vDistances = [];
     List<double> hDistances = [];
 
-    if(hElement.isNotEmpty) {
+    if (hElement.isNotEmpty) {
       hElement.forEach((element) {
         vSheetsSize!.add(element.start!.dy);
       });
@@ -273,7 +272,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       }
     }
 
-    if(vElement.isNotEmpty) {
+    if (vElement.isNotEmpty) {
       vElement.forEach((element) {
         hSheetsSize!.add(element.start!.dx);
       });
@@ -296,31 +295,56 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       }
     }
 
-
     verticalSheetsSize = ValueNotifier(vDistances);
     horizontalSheetsSize = ValueNotifier(hDistances);
-
   }
 
-  void changeSizeOfSheet(int index, int newValue, { required Axis axis}){
-
-
+  void changeSizeOfSheet(int index, int newValue, {required Axis axis}) {
     // horizontalSheetsSize = ValueNotifier(hDistances);
 
-    if(axis == Axis.horizontal){ //مجموع را از اول تا اندکس
+    if (axis == Axis.horizontal) {
+      //مجموع را از اول تا اندکس
       var sum = 0.0;
-      var sumBefore = 0.0;
+      var remainingValue = 0.0;
 
-      for(int i = 0; i <= index; i++){
-        sum += verticalSheetsSize.value[i];
+      if (index == verticalSheetsSize.value.length - 1) {
+        for (int i = 0; i <= index - 1; i++) {
+          sum += verticalSheetsSize.value[i];
+        }
+        remainingValue = sum + verticalSheetsSize.value[index] - newValue;
+      } else {
+        for (int i = 0; i <= index; i++) {
+          sum += verticalSheetsSize.value[i];
+        }
+        remainingValue = sum - verticalSheetsSize.value[index] + newValue;
       }
 
+
       for (int i = 0; i < data.length; i++) {
-        if(!data[i].data.isVertical){
-          if(data[i].start!.dy == sum){
-            data[i].start = Offset(data[i].start!.dx, newValue.toDouble());
-            data[i].offset = Offset(data[i].offset.dx, newValue.toDouble());
-            data[i].end = Offset(data[i].end!.dx, newValue.toDouble());
+        if (!data[i].data.isVertical) {
+          if (data[i].start!.dy == sum) {
+            data[i].start =
+                Offset(data[i].start!.dx, remainingValue.toDouble());
+            data[i].offset =
+                Offset(data[i].offset.dx, remainingValue.toDouble());
+            data[i].end =
+                Offset(data[i].end!.dx, remainingValue.toDouble());
+            data[i].changedOffset = true;
+          }
+        }
+        if (data[i].data.isVertical) {
+          if (data[i].start!.dy == sum) {
+            data[i].offset = Offset(data[i].offset.dx,
+                data[i].offset.dy + (remainingValue.toDouble() / 2));
+            data[i].start =
+                Offset(data[i].start!.dx, remainingValue.toDouble());
+            data[i].changedOffset = true;
+          }
+          if (data[i].end!.dy == sum) {
+            data[i].offset = Offset(data[i].offset.dx,
+                data[i].offset.dy + (remainingValue.toDouble() / 2));
+            data[i].end =
+                Offset(data[i].end!.dx, remainingValue.toDouble());
             data[i].changedOffset = true;
           }
         }
@@ -331,20 +355,53 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       //     }
       // }
     }
-    if(axis == Axis.vertical){ //مجموع را از اول تا اندکس
+    if (axis == Axis.vertical) {
+      //مجموع را از اول تا اندکس
       var sum = 0.0;
-      var sumBefore = 0.0;
+      var remainingValue = 0.0;
 
-      for(int i = 0; i <= index; i++){
-        sum += horizontalSheetsSize.value[i];
+      if (index == horizontalSheetsSize.value.length - 1) {
+        for (int i = 0; i <= index - 1; i++) {
+          sum += horizontalSheetsSize.value[i];
+        }
+        remainingValue = sum + horizontalSheetsSize.value[index] - newValue;
+      } else {
+        for (int i = 0; i <= index; i++) {
+          sum += horizontalSheetsSize.value[i];
+        }
+        remainingValue = sum - horizontalSheetsSize.value[index] + newValue;
       }
 
+
+      // sum += remainingValue;
+
       for (int i = 0; i < data.length; i++) {
-        if(data[i].data.isVertical){
-          if(data[i].start!.dx == sum){
-            data[i].start = Offset( newValue.toDouble(), data[i].start!.dy);
-            data[i].offset = Offset(newValue.toDouble(), data[i].offset.dy);
-            data[i].end = Offset(newValue.toDouble(), data[i].end!.dy);
+        if (data[i].data.isVertical) {
+          if (data[i].start!.dx == sum) {
+            data[i].start =
+                Offset(remainingValue.toDouble(), data[i].start!.dy);
+            data[i].offset =
+                Offset(remainingValue.toDouble(), data[i].offset.dy);
+            data[i].end =
+                Offset(remainingValue.toDouble(), data[i].end!.dy);
+            data[i].changedOffset = true;
+          }
+        }
+        if (!data[i].data.isVertical) {
+          if (data[i].start!.dx == sum) {
+            data[i].offset = Offset(
+                data[i].offset.dx + (remainingValue.toDouble() / 2),
+                data[i].offset.dy);
+            data[i].start =
+                Offset(remainingValue.toDouble(), data[i].start!.dy);
+            data[i].changedOffset = true;
+          }
+          if (data[i].end!.dx == sum) {
+            data[i].offset = Offset(
+                data[i].offset.dx + (remainingValue.toDouble() / 2),
+                data[i].offset.dy);
+            data[i].end =
+                Offset(remainingValue.toDouble(), data[i].end!.dy);
             data[i].changedOffset = true;
           }
         }
@@ -393,28 +450,32 @@ class MyPainter extends CustomPainter {
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(size.width / 2, 0),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(size.width, 0),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
         offset: Offset(size.width / 2, size.height),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: Offset(0, size.height),
         end: Offset(size.width, size.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(size.width / 2, 0),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: const Offset(0, 0),
         end: Offset(0, size.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
         offset: Offset(size.width / 2, 0),
-        fixed: true, changedOffset: false,
+        fixed: true,
+        changedOffset: false,
         start: Offset(size.width, 0),
         end: Offset(size.width, size.height),
       ),
@@ -425,15 +486,15 @@ class MyPainter extends CustomPainter {
       edge = data[i].edge!;
 
       if (data[i].data.isVertical) {
-
-        if(data[i].changedOffset){
+        if (data[i].changedOffset) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(data[i].offset.dx, edge.top),
               end: Offset(data[i].offset.dx, edge.bottom));
         } else {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(edge.left + (edge.right - edge.left) / 2, edge.top),
-              end: Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom));
+              end: Offset(
+                  edge.left + (edge.right - edge.left) / 2, edge.bottom));
         }
         // if (!data[i].fixed) {
         //   data[i].offset =
@@ -446,11 +507,11 @@ class MyPainter extends CustomPainter {
         //       Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
         // }
       } else {
-        if(data[i].changedOffset){
+        if (data[i].changedOffset) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(edge.left, data[i].offset.dy),
               end: Offset(edge.right, data[i].offset.dy));
-        }else{
+        } else {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2),
               end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
@@ -634,9 +695,6 @@ class MyPainter extends CustomPainter {
       canvas.drawLine(hp6, hp7, paint);
     }
   }
-
-
-
 }
 
 class Edge {
