@@ -325,35 +325,24 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           if (data[i].start!.dy == sum) {
             data[i].start =
                 Offset(data[i].start!.dx, remainingValue.toDouble());
-            data[i].offset =
-                Offset(data[i].offset.dx, remainingValue.toDouble());
-            data[i].end =
-                Offset(data[i].end!.dx, remainingValue.toDouble());
+            data[i].end = Offset(data[i].end!.dx, remainingValue.toDouble());
+            data[i].offset = Offset(data[i].offset.dx, data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
             data[i].changedOffset = true;
           }
         }
         if (data[i].data.isVertical) {
           if (data[i].start!.dy == sum) {
-            data[i].offset = Offset(data[i].offset.dx,
-                data[i].offset.dy + (remainingValue.toDouble() / 2));
-            data[i].start =
-                Offset(data[i].start!.dx, remainingValue.toDouble());
+            data[i].start = Offset(data[i].start!.dx, remainingValue.toDouble());
+            data[i].offset = Offset(data[i].offset.dx, data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
             data[i].changedOffset = true;
           }
           if (data[i].end!.dy == sum) {
-            data[i].offset = Offset(data[i].offset.dx,
-                data[i].offset.dy + (remainingValue.toDouble() / 2));
-            data[i].end =
-                Offset(data[i].end!.dx, remainingValue.toDouble());
+            data[i].end = Offset(data[i].end!.dx, remainingValue.toDouble());
+            data[i].offset = Offset(data[i].offset.dx, data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
             data[i].changedOffset = true;
           }
         }
       }
-      // for (int i = 0; i < data.length; i++) {
-      //     if(data[i].edge!.bottom == sum || data[i].edge!.top == sum){
-      //       data[i].fixed = false;
-      //     }
-      // }
     }
     if (axis == Axis.vertical) {
       //مجموع را از اول تا اندکس
@@ -378,39 +367,32 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       for (int i = 0; i < data.length; i++) {
         if (data[i].data.isVertical) {
           if (data[i].start!.dx == sum) {
-            data[i].start =
-                Offset(remainingValue.toDouble(), data[i].start!.dy);
-            data[i].offset =
-                Offset(remainingValue.toDouble(), data[i].offset.dy);
-            data[i].end =
-                Offset(remainingValue.toDouble(), data[i].end!.dy);
+            data[i].start = Offset(remainingValue.toDouble(), data[i].start!.dy);
+            data[i].end = Offset(remainingValue.toDouble(), data[i].end!.dy);
+
+            data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].offset.dy);
             data[i].changedOffset = true;
           }
         }
         if (!data[i].data.isVertical) {
           if (data[i].start!.dx == sum) {
-            data[i].offset = Offset(
-                data[i].offset.dx + (remainingValue.toDouble() / 2),
-                data[i].offset.dy);
-            data[i].start =
-                Offset(remainingValue.toDouble(), data[i].start!.dy);
+            // if(data[i].offset.dx > sum) {
+            //   data[i].offset = Offset(data[i].offset.dx - ((sum - remainingValue.toDouble()) / 2), data[i].offset.dy);
+            // } else {
+            //   data[i].offset = Offset(data[i].offset.dx + ((sum - remainingValue.toDouble()) / 2), data[i].offset.dy);
+            // }
+
+            data[i].start = Offset(remainingValue.toDouble(), data[i].start!.dy);
+            data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].offset.dy);
             data[i].changedOffset = true;
           }
           if (data[i].end!.dx == sum) {
-            data[i].offset = Offset(
-                data[i].offset.dx + (remainingValue.toDouble() / 2),
-                data[i].offset.dy);
-            data[i].end =
-                Offset(remainingValue.toDouble(), data[i].end!.dy);
+            data[i].end = Offset(remainingValue.toDouble(), data[i].end!.dy);
+            data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].offset.dy);
             data[i].changedOffset = true;
           }
         }
       }
-      // for (int i = 0; i < data.length; i++) {
-      //     if(data[i].edge!.right == sum || data[i].edge!.left == sum){
-      //       data[i].fixed = false;
-      //     }
-      // }
     }
 
     setState(() {});
