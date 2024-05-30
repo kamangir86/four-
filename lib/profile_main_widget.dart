@@ -12,7 +12,7 @@ ValueNotifier<List<double>> horizontalSheetsSize =
 GlobalKey key = GlobalKey();
 
 class ProfileMainWidget extends StatefulWidget {
-  const ProfileMainWidget(
+  const   ProfileMainWidget(
       {required this.height, required this.width, super.key});
 
   final double height;
@@ -26,43 +26,55 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
   List<MyDragTargetDetails<Profile>> myList = [];
   List<MyDragTargetDetails<Profile>> data = [];
 
+  var sizeOfSizeWidget = 300.0;
+
   @override
   Widget build(BuildContext context) {
+    var availableWidth = MediaQuery.sizeOf(context).width;
+    var availableHeight = MediaQuery.sizeOf(context).height - 204;
+
+    var scale = 1.0;
+    if((widget.width + 60 ) > availableWidth){
+      scale = 1 -  (availableWidth / (widget.width + 60 ));
+    }else{
+      scale = 1 -  ((widget.width + 60 )/ availableWidth);
+    }
+
     data = myList;
     List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
 
     dataCopy.insertAll(0, [
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
-        offset: Offset(widget.width / 2, 0),
+        offset: Offset(availableWidth / 2, 0),
         fixed: true,
         changedOffset: false,
         start: const Offset(0, 0),
-        end: Offset(widget.width, 0),
+        end: Offset(availableWidth, 0),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: false),
-        offset: Offset(widget.width / 2, widget.height),
+        offset: Offset(availableWidth / 2, widget.height / scale),
         fixed: true,
         changedOffset: false,
-        start: Offset(0, widget.height),
-        end: Offset(widget.width, widget.height),
+        start: Offset(0, widget.height/ scale),
+        end: Offset(availableWidth, widget.height/ scale),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
-        offset: Offset(widget.width / 2, 0),
+        offset: Offset(availableWidth / 2, 0),
         fixed: true,
         changedOffset: false,
         start: const Offset(0, 0),
-        end: Offset(0, widget.height),
+        end: Offset(0, widget.height/ scale),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: '', isVertical: true),
-        offset: Offset(widget.width / 2, 0),
+        offset: Offset(availableWidth / 2, 0),
         fixed: true,
         changedOffset: false,
-        start: Offset(widget.width, 0),
-        end: Offset(widget.width, widget.height),
+        start: Offset(availableWidth, 0),
+        end: Offset(availableWidth, widget.height/ scale),
       ),
     ]);
 
@@ -84,6 +96,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].fixed = true;
           data[i].start = Offset(point.toDouble(), edge.top);
           data[i].end = Offset(point.toDouble(), edge.bottom);
+
+          data[i].percent = point / widget.height;
         }
       } else {
         var point = (edge.top + (edge.bottom - edge.top) / 2).ceil();
@@ -93,54 +107,45 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].fixed = true;
           data[i].start = Offset(edge.left, point.toDouble());
           data[i].end = Offset(edge.right, point.toDouble());
+
+          data[i].percent = point / widget.width;
         }
       }
     }
 
     computeSizeOfSheets(data, Size(widget.width, widget.height));
 
-    return Column(
-      children: [
-        SizedBox(
-          height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                  onPressed: () {
-                    myList.removeLast();
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.undo)),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.redo))
-            ],
-          ),
-        ),
-        Text("${myList.length}"),
-        Row(
+    return Container(
+      color: Colors.yellow,
+      height: availableHeight,
+      width: availableWidth,
+      margin: const EdgeInsets.only(right: 20, bottom: 20, top: 20),
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Column(
-              children: [
-                ValueListenableBuilder<List<double>?>(
-                  valueListenable: verticalSheetsSize,
-                  builder: (BuildContext context, value, Widget? child) {
-                    return VerticalSize(
-                      height: widget.height,
-                      splits: value, // [25, 25, 25, 25],
-                      onChangeSize: (int newValue, int index) {
-                        changeSizeOfSheet(index, newValue,
-                            axis: Axis.horizontal);
-                      },
-                    );
-                  },
-                ),
-                const SizedBox(
-                  height: 60,
-                )
-              ],
+            Container(
+              color: Colors.orange,
+              width: sizeOfSizeWidget,
+              child: ValueListenableBuilder<List<double>?>(
+                valueListenable: verticalSheetsSize,
+                builder: (BuildContext context, value, Widget? child) {
+                  return VerticalSize(
+                    height: widget.height,
+                    splits: value, // [25, 25, 25, 25],
+                    onChangeSize: (int newValue, int index) {
+                      changeSizeOfSheet(index, newValue,
+                          axis: Axis.horizontal);
+                    },
+                  );
+                },
+              ),
             ),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Stack(
                   children: [
@@ -158,28 +163,32 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                     ),
                   ],
                 ),
-                ValueListenableBuilder<List<double>?>(
-                  builder: (BuildContext context, List<double>? value,
-                      Widget? child) {
-                    return HorizontalSize(
-                      width: widget.width,
-                      splits: value, // [150, 75,75],
-                      onChangeSize: (int newValue, int index) {
-                        changeSizeOfSheet(
-                          index,
-                          newValue,
-                          axis: Axis.vertical,
-                        );
-                      },
-                    );
-                  },
-                  valueListenable: horizontalSheetsSize,
+                Container(
+                  color: Colors.orange,
+                  height: sizeOfSizeWidget,
+                  child: ValueListenableBuilder<List<double>?>(
+                    builder: (BuildContext context, List<double>? value,
+                        Widget? child) {
+                      return HorizontalSize(
+                        width: widget.width,
+                        splits: value, // [150, 75,75],
+                        onChangeSize: (int newValue, int index) {
+                          changeSizeOfSheet(
+                            index,
+                            newValue,
+                            axis: Axis.vertical,
+                          );
+                        },
+                      );
+                    },
+                    valueListenable: horizontalSheetsSize,
+                  ),
                 )
               ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 
@@ -268,7 +277,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
       for (int i = 0; i < vSheetsSize.length - 1; i++) {
         double distance = vSheetsSize[i + 1] - vSheetsSize[i];
-        vDistances.add(distance);
+        vDistances.add(distance / size.height);
       }
     }
 
@@ -291,7 +300,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       hSheetsSize = uniqueNumbers;
       for (int i = 0; i < hSheetsSize.length - 1; i++) {
         double distance = hSheetsSize[i + 1] - hSheetsSize[i];
-        hDistances.add(distance);
+        hDistances.add(distance / size.width);
       }
     }
 
@@ -319,26 +328,36 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         remainingValue = sum - verticalSheetsSize.value[index] + newValue;
       }
 
-
       for (int i = 0; i < data.length; i++) {
         if (!data[i].data.isVertical) {
           if (data[i].start!.dy == sum) {
             data[i].start =
                 Offset(data[i].start!.dx, remainingValue.toDouble());
             data[i].end = Offset(data[i].end!.dx, remainingValue.toDouble());
-            data[i].offset = Offset(data[i].offset.dx, data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
+            data[i].offset = Offset(
+                data[i].offset.dx,
+                data[i].start!.dy +
+                    ((data[i].end!.dy - data[i].start!.dy) / 2));
             data[i].changedOffset = true;
+            data[i].percent = remainingValue / widget.width;
           }
         }
         if (data[i].data.isVertical) {
           if (data[i].start!.dy == sum) {
-            data[i].start = Offset(data[i].start!.dx, remainingValue.toDouble());
-            data[i].offset = Offset(data[i].offset.dx, data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
+            data[i].start =
+                Offset(data[i].start!.dx, remainingValue.toDouble());
+            data[i].offset = Offset(
+                data[i].offset.dx,
+                data[i].start!.dy +
+                    ((data[i].end!.dy - data[i].start!.dy) / 2));
             data[i].changedOffset = true;
           }
           if (data[i].end!.dy == sum) {
             data[i].end = Offset(data[i].end!.dx, remainingValue.toDouble());
-            data[i].offset = Offset(data[i].offset.dx, data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
+            data[i].offset = Offset(
+                data[i].offset.dx,
+                data[i].start!.dy +
+                    ((data[i].end!.dy - data[i].start!.dy) / 2));
             data[i].changedOffset = true;
           }
         }
@@ -361,17 +380,20 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         remainingValue = sum - horizontalSheetsSize.value[index] + newValue;
       }
 
-
       // sum += remainingValue;
 
       for (int i = 0; i < data.length; i++) {
         if (data[i].data.isVertical) {
           if (data[i].start!.dx == sum) {
-            data[i].start = Offset(remainingValue.toDouble(), data[i].start!.dy);
+            data[i].start =
+                Offset(remainingValue.toDouble(), data[i].start!.dy);
             data[i].end = Offset(remainingValue.toDouble(), data[i].end!.dy);
 
-            data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].offset.dy);
+            data[i].offset = Offset(
+                data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2),
+                data[i].offset.dy);
             data[i].changedOffset = true;
+            data[i].percent = remainingValue / widget.height;
           }
         }
         if (!data[i].data.isVertical) {
@@ -382,13 +404,18 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
             //   data[i].offset = Offset(data[i].offset.dx + ((sum - remainingValue.toDouble()) / 2), data[i].offset.dy);
             // }
 
-            data[i].start = Offset(remainingValue.toDouble(), data[i].start!.dy);
-            data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].offset.dy);
+            data[i].start =
+                Offset(remainingValue.toDouble(), data[i].start!.dy);
+            data[i].offset = Offset(
+                data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2),
+                data[i].offset.dy);
             data[i].changedOffset = true;
           }
           if (data[i].end!.dx == sum) {
             data[i].end = Offset(remainingValue.toDouble(), data[i].end!.dy);
-            data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].offset.dy);
+            data[i].offset = Offset(
+                data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2),
+                data[i].offset.dy);
             data[i].changedOffset = true;
           }
         }
@@ -403,7 +430,7 @@ class MyPainter extends CustomPainter {
   MyPainter({required this.data});
 
   double ratio = 1;
-  int sizeScale = 8;
+  int sizeScale = 40;
   List<MyDragTargetDetails<Profile>> data;
   var z1 = 0.0;
   var z2 = 0.0;
@@ -420,7 +447,7 @@ class MyPainter extends CustomPainter {
     z2 = z1 + (z1 / 3);
 
     var paint = Paint();
-    paint.strokeWidth = 1;
+    paint.strokeWidth = 2;
     paint.color = Colors.black;
     paint.style = PaintingStyle.stroke;
 
