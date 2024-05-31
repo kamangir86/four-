@@ -28,53 +28,47 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
   var sizeOfSizeWidget = 300.0;
 
+
   @override
   Widget build(BuildContext context) {
     var availableWidth = MediaQuery.sizeOf(context).width;
-    var availableHeight = MediaQuery.sizeOf(context).height - 204;
-
-    var scale = 1.0;
-    if((widget.width + 60 ) > availableWidth){
-      scale = 1 -  (availableWidth / (widget.width + 60 ));
-    }else{
-      scale = 1 -  ((widget.width + 60 )/ availableWidth);
-    }
+    var availableHeight = MediaQuery.sizeOf(context).height - 244;
 
     data = myList;
     List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
 
     dataCopy.insertAll(0, [
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: false),
-        offset: Offset(availableWidth / 2, 0),
+        data: Profile(name: ProfileName.edge, isVertical: false),
+        offset: Offset(widget.width / 2, 0),
         fixed: true,
         changedOffset: false,
         start: const Offset(0, 0),
-        end: Offset(availableWidth, 0),
+        end: Offset(widget.width, 0),
       ),
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: false),
-        offset: Offset(availableWidth / 2, widget.height / scale),
+        data: Profile(name: ProfileName.edge, isVertical: false),
+        offset: Offset(widget.width / 2, widget.height),
         fixed: true,
         changedOffset: false,
-        start: Offset(0, widget.height/ scale),
-        end: Offset(availableWidth, widget.height/ scale),
+        start: Offset(0, widget.height),
+        end: Offset(widget.width, widget.height),
       ),
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: true),
-        offset: Offset(availableWidth / 2, 0),
+        data: Profile(name: ProfileName.edge, isVertical: true),
+        offset: Offset(widget.width / 2, 0),
         fixed: true,
         changedOffset: false,
         start: const Offset(0, 0),
-        end: Offset(0, widget.height/ scale),
+        end: Offset(0, widget.height),
       ),
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: true),
-        offset: Offset(availableWidth / 2, 0),
+        data: Profile(name: ProfileName.edge, isVertical: true),
+        offset: Offset(widget.width / 2, 0),
         fixed: true,
         changedOffset: false,
-        start: Offset(availableWidth, 0),
-        end: Offset(availableWidth, widget.height/ scale),
+        start: Offset(widget.width, 0),
+        end: Offset(widget.width, widget.height),
       ),
     ]);
 
@@ -116,7 +110,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     computeSizeOfSheets(data, Size(widget.width, widget.height));
 
     return Container(
-      color: Colors.yellow,
+      color: Colors.transparent,
       height: availableHeight,
       width: availableWidth,
       margin: const EdgeInsets.only(right: 20, bottom: 20, top: 20),
@@ -127,7 +121,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
-              color: Colors.orange,
+              color: Colors.transparent,
               width: sizeOfSizeWidget,
               child: ValueListenableBuilder<List<double>?>(
                 valueListenable: verticalSheetsSize,
@@ -164,7 +158,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                   ],
                 ),
                 Container(
-                  color: Colors.orange,
+                  color: Colors.transparent,
                   height: sizeOfSizeWidget,
                   child: ValueListenableBuilder<List<double>?>(
                     builder: (BuildContext context, List<double>? value,
@@ -277,7 +271,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
       for (int i = 0; i < vSheetsSize.length - 1; i++) {
         double distance = vSheetsSize[i + 1] - vSheetsSize[i];
-        vDistances.add(distance / size.height);
+        vDistances.add(distance);
       }
     }
 
@@ -300,7 +294,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       hSheetsSize = uniqueNumbers;
       for (int i = 0; i < hSheetsSize.length - 1; i++) {
         double distance = hSheetsSize[i + 1] - hSheetsSize[i];
-        hDistances.add(distance / size.width);
+        hDistances.add(distance);
       }
     }
 
@@ -430,7 +424,7 @@ class MyPainter extends CustomPainter {
   MyPainter({required this.data});
 
   double ratio = 1;
-  int sizeScale = 40;
+  int sizeScale = 65;
   List<MyDragTargetDetails<Profile>> data;
   var z1 = 0.0;
   var z2 = 0.0;
@@ -443,7 +437,7 @@ class MyPainter extends CustomPainter {
       ratio = size.height / size.width;
     }
 
-    z1 = ratio * sizeScale;
+    z1 = sizeScale.toDouble();
     z2 = z1 + (z1 / 3);
 
     var paint = Paint();
@@ -457,7 +451,7 @@ class MyPainter extends CustomPainter {
 
     dataCopy.insertAll(0, [
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: false),
+        data: Profile(name: ProfileName.edge, isVertical: false),
         offset: Offset(size.width / 2, 0),
         fixed: true,
         changedOffset: false,
@@ -465,7 +459,7 @@ class MyPainter extends CustomPainter {
         end: Offset(size.width, 0),
       ),
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: false),
+        data: Profile(name: ProfileName.edge, isVertical: false),
         offset: Offset(size.width / 2, size.height),
         fixed: true,
         changedOffset: false,
@@ -473,7 +467,7 @@ class MyPainter extends CustomPainter {
         end: Offset(size.width, size.height),
       ),
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: true),
+        data: Profile(name: ProfileName.edge, isVertical: true),
         offset: Offset(size.width / 2, 0),
         fixed: true,
         changedOffset: false,
@@ -481,7 +475,7 @@ class MyPainter extends CustomPainter {
         end: Offset(0, size.height),
       ),
       MyDragTargetDetails<Profile>(
-        data: Profile(name: '', isVertical: true),
+        data: Profile(name: ProfileName.edge, isVertical: true),
         offset: Offset(size.width / 2, 0),
         fixed: true,
         changedOffset: false,
@@ -494,7 +488,7 @@ class MyPainter extends CustomPainter {
       Edge edge;
       edge = data[i].edge!;
 
-      if (data[i].data.isVertical) {
+      if (data[i].data.name == ProfileName.vertical) {
         if (data[i].changedOffset) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(data[i].offset.dx, edge.top),
@@ -515,7 +509,8 @@ class MyPainter extends CustomPainter {
         //   data[i].end =
         //       Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
         // }
-      } else {
+      } else
+      if (data[i].data.name == ProfileName.horizontal) {
         if (data[i].changedOffset) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(edge.left, data[i].offset.dy),
@@ -525,18 +520,17 @@ class MyPainter extends CustomPainter {
               start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2),
               end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
         }
-
-        // if (!data[i].fixed) {
-        //   data[i].offset =
-        //       Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
-        //   data[i].edge = edge;
-        //   data[i].fixed = true;
-        //   data[i].start =
-        //       Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2);
-        //   data[i].end =
-        //       Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2);
-        // }
-      }
+      } else
+      if (data[i].data.name == ProfileName.double) {} else
+      if (data[i].data.name == ProfileName.fillH) {} else
+      if (data[i].data.name == ProfileName.fillV) {} else
+      if (data[i].data.name == ProfileName.left) {} else
+      if (data[i].data.name == ProfileName.right) {} else
+      if (data[i].data.name == ProfileName.top) {} else
+      if (data[i].data.name == ProfileName.topRight) {} else
+      if (data[i].data.name == ProfileName.topLeft) {} else
+      if (data[i].data.name == ProfileName.dLeft) {} else
+      if (data[i].data.name == ProfileName.dRight) {}
     }
   }
 

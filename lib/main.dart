@@ -44,28 +44,115 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Column(
           children: [
             Container(
-              height: 80,
+              height: 60,
               color: Colors.blue,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: SizedBox(
+                height: 60,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          // myList.removeLast();
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.undo)),
+                    IconButton(
+                        onPressed: () {}, icon: const Icon(Icons.redo))
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: 60,
+              color: Colors.grey,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox(
-                    height: 60,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              // myList.removeLast();
-                              setState(() {});
-                            },
-                            icon: const Icon(Icons.undo)),
-                        IconButton(
-                            onPressed: () {}, icon: const Icon(Icons.redo))
-                      ],
+                  Draggable<Profile>(
+                    data: Profile(name: ProfileName.double, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/double.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/double.png',
+                        height: 30,
+                        width: 30,
+                      ),
                     ),
                   ),
-                  Text("1"),
+                  Draggable<Profile>(
+                    data: Profile(name: ProfileName.top, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/top.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/top.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+                   Draggable<Profile>(
+                    data: Profile(name: ProfileName.right, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/right.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/right.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+                   Draggable<Profile>(
+                    data: Profile(name: ProfileName.topRight, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/topRight.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/topRight.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+                  Draggable<Profile>(
+                    data: Profile(name: ProfileName.dRight, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/dRight.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/dRight.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+                  Draggable<Profile>(
+                    data: Profile(name: ProfileName.fillV, isVertical: false),
+                    feedback: Image.asset(
+                      'assets/fillV.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/fillV.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -73,39 +160,93 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 60,
               color: Colors.grey,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Draggable<Profile>(
-                    data: Profile(name: "1", isVertical: true),
+                    data: Profile(name: ProfileName.vertical, isVertical: true),
                     feedback: Image.asset(
-                      'assets/1.png',
+                      'assets/vertical.png',
                       height: 30,
                     ),
-                    child: Image.asset(
-                      'assets/1.png',
-                      height: 30,
-                      width: 30,
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/vertical.png',
+                        height: 30,
+                        width: 30,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 20,
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: "1", isVertical: false),
-                    feedback: RotatedBox(
-                        quarterTurns: 1,
-                        child: Image.asset(
-                          'assets/1.png',
-                          height: 30,
-                        )),
-                    child: RotatedBox(
-                        quarterTurns: 1,
-                        child: Image.asset(
-                          'assets/1.png',
-                          height: 30,
-                          width: 30,
-                        )),
+                    data: Profile(name: ProfileName.horizontal, isVertical: false),
+                    feedback: Image.asset(
+                      'assets/horizontal.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/horizontal.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
                   ),
+                  Draggable<Profile>(
+                    data: Profile(name: ProfileName.left, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/left.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/left.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+                   Draggable<Profile>(
+                    data: Profile(name: ProfileName.topLeft, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/topLeft.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/topLeft.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+                   Draggable<Profile>(
+                    data: Profile(name: ProfileName.dLeft, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/dLeft.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/dLeft.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+                  Draggable<Profile>(
+                    data: Profile(name: ProfileName.fillH, isVertical: true),
+                    feedback: Image.asset(
+                      'assets/fillH.png',
+                      height: 30,
+                    ),
+                    child: ElemanWidget(
+                      child: Image.asset(
+                        'assets/fillH.png',
+                        height: 30,
+                        width: 30,
+                      ),
+                    ),
+                  ),
+
                 ],
               ),
             ),
@@ -329,13 +470,37 @@ class MyDragTaget<T extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    var availableWidth = MediaQuery.sizeOf(context).width - 20;
+    var availableHeight = MediaQuery.sizeOf(context).height - 264;
+
+    var scale;
+
+    if(size.width > size.height){
+      if((300 + size.width) < availableWidth){
+        scale = (availableWidth / (300 + size.width));
+      }else{
+        scale = ((300 + size.width)/ availableWidth);
+      }
+    } else {
+      if((300 + size.height) < availableHeight){
+        scale = (availableHeight / (300 + size.height));
+      }else{
+        scale = ((300 + size.height)/ availableHeight);
+      }
+    }
+
+
     return DragTarget<Profile>(onAcceptWithDetails: (data) {
       RenderBox box = key.currentContext!.findRenderObject() as RenderBox;
       Offset position = box.localToGlobal(Offset.zero);
+
+      var dx = (data.offset.dx - (position.dx));
+      var dy = (data.offset.dy - (position.dy));
+
       onAcceptWithDetails?.call(MyDragTargetDetails<T>(
           data: data.data as T,
-          offset: Offset(
-              data.offset.dx - (position.dx), data.offset.dy - (position.dy)),
+          offset: Offset(dx * scale, dy * scale),
           fixed: false,
           changedOffset: false));
     }, builder: (c, _, __) {
@@ -379,10 +544,14 @@ class MyDragTargetDetails<T> {
 }
 
 class Profile {
-  String name;
+  ProfileName name;
   bool isVertical;
 
   Profile({required this.name, required this.isVertical});
+}
+
+enum ProfileName{
+  horizontal, vertical, left, right, top, fillH, fillV, topRight, topLeft, double, dLeft, dRight, edge
 }
 
 showSizeDialog(int value, BuildContext context,
@@ -571,5 +740,25 @@ class _numPadState extends State<numPad> {
     }
 
     setState(() {});
+  }
+}
+
+
+class ElemanWidget extends StatelessWidget {
+  const ElemanWidget({required this.child, super.key});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 35,
+      width: 35,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: Colors.white
+      ),
+      child: child,
+    );
   }
 }
