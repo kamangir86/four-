@@ -100,6 +100,30 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, point.toDouble());
         }
       }
+      if (data[i].data.name == ProfileName.double) {
+
+        var point = (edge.left + ((edge.right - edge.left) / 3).round());
+        var point2 = edge.right -  ((edge.right - edge.left) / 3).round();
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(point.toDouble(), edge.top);
+          data[i].end = Offset(point.toDouble(), edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx, (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].start2 = Offset(point2.toDouble(), edge.top);
+          data[i].end2 = Offset(point2.toDouble(), edge.bottom);
+          data[i].offset2 = Offset(data[i].start2!.dx, (data[i].end2!.dy - data[i].start2!.dy) / 2);
+          data[i].fixed = true;
+        }
+
+      } else
+      if (data[i].data.name == ProfileName.fillH) {} else
+      if (data[i].data.name == ProfileName.fillV) {} else
+      if (data[i].data.name == ProfileName.left) {} else
+      if (data[i].data.name == ProfileName.right) {} else
+      if (data[i].data.name == ProfileName.top) {} else
+      if (data[i].data.name == ProfileName.topRight) {} else
+      if (data[i].data.name == ProfileName.topLeft) {} else
+      if (data[i].data.name == ProfileName.dLeft) {} else
+      if (data[i].data.name == ProfileName.dRight) {}
     }
 
     computeSizeOfSheets(data, Size(widget.width, widget.height));
@@ -219,6 +243,34 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           rightEdge = min(rightEdge, endX);
         }
       }
+
+      if(line.offset2 != null){
+
+        double startX = line.start2!.dx;
+        double startY = line.start2!.dy;
+        double endX = line.end2!.dx;
+        double endY = line.end2!.dy;
+
+        // Check for vertical lines
+        if (startY == endY && (x >= startX && x <= endX)) {
+          if (y >= startY && (x >= startX && x <= endX)) {
+            bottomEdge = max(bottomEdge, endY);
+          }
+          if (y <= endY && (x >= startX && x <= endX)) {
+            topEdge = min(topEdge, startY);
+          }
+        }
+
+        // Check for horizontal lines
+        if (startX == endX && (y >= startY && y <= endY)) {
+          if (x >= startX && (y >= startY && y <= endY)) {
+            leftEdge = max(leftEdge, startX);
+          }
+          if (x <= endX && (y >= startY && y <= endY)) {
+            rightEdge = min(rightEdge, endX);
+          }
+        }
+      }
     }
 
     return Edge(
@@ -273,6 +325,9 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     if (vElement.isNotEmpty) {
       vElement.forEach((element) {
         hSheetsSize!.add(element.start!.dx);
+        if(element.offset2 != null) {
+          hSheetsSize.add(element.start2!.dx);
+        }
       });
 
       hSheetsSize.sort();
@@ -382,14 +437,20 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                 data[i].offset.dy);
             data[i].changedOffset = true;
           }
+
+          if (data[i].offset2 != null && data[i].start2!.dx == sum) {
+            data[i].start2 =
+                Offset(remainingValue.toDouble(), data[i].start2!.dy);
+            data[i].end2 = Offset(remainingValue.toDouble(), data[i].end2!.dy);
+
+            data[i].offset2 = Offset(
+                data[i].start2!.dx + ((data[i].end2!.dx - data[i].start2!.dx) / 2),
+                data[i].offset2!.dy);
+            data[i].changedOffset = true;
+          }
         }
         if (!data[i].data.isVertical) {
           if (data[i].start!.dx == sum) {
-            // if(data[i].offset.dx > sum) {
-            //   data[i].offset = Offset(data[i].offset.dx - ((sum - remainingValue.toDouble()) / 2), data[i].offset.dy);
-            // } else {
-            //   data[i].offset = Offset(data[i].offset.dx + ((sum - remainingValue.toDouble()) / 2), data[i].offset.dy);
-            // }
 
             data[i].start =
                 Offset(remainingValue.toDouble(), data[i].start!.dy);
@@ -448,48 +509,14 @@ class MyPainter extends CustomPainter {
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
             start: data[i].start!,
             end: data[i].end!);
-        /*if (data[i].changedOffset) {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: Offset(data[i].offset.dx, edge.top),
-              end: Offset(data[i].offset.dx, edge.bottom));
-        } else {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: Offset(edge.left + (edge.right - edge.left) / 2, edge.top),
-              end: Offset(
-                  edge.left + (edge.right - edge.left) / 2, edge.bottom));
-        }*/
-      } else
-      if (data[i].data.name == ProfileName.horizontal) {
-        /*if (data[i].changedOffset) {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: Offset(edge.left, data[i].offset.dy),
-              end: Offset(edge.right, data[i].offset.dy));
-        } else {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2),
-              end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
-        }*/
       } else
       if (data[i].data.name == ProfileName.double) {
-        if (data[i].changedOffset) {
-          drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: Offset(data[i].offset.dx, edge.top),
-              end: Offset(data[i].offset.dx, edge.bottom));
-        } else {
-
-          data[i].start = Offset(edge.left + (edge.right - edge.left) / 3, edge.top);
-          data[i].end = Offset(edge.left + (edge.right - edge.left) / 3, edge.bottom);
-          data[i].offset = Offset(data[i].start!.dx, (data[i].end!.dy - data[i].start!.dy) / 2);
-          data[i].start2 = Offset((edge.left + (edge.right - edge.left) / 3) * 2, edge.top);
-          data[i].end2 = Offset((edge.left + (edge.right - edge.left) / 3) * 2, edge.bottom);
-          data[i].offset2 = Offset(data[i].start2!.dx, (data[i].end2!.dy - data[i].start2!.dy) / 2);
-
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: data[i].start!, end: data[i].end!);
 
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
             start: data[i].start2!, end: data[i].end2!);
-        }
+
       } else
       if (data[i].data.name == ProfileName.fillH) {} else
       if (data[i].data.name == ProfileName.fillV) {} else
