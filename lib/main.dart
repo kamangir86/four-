@@ -522,8 +522,10 @@ class MyDragTargetDetails<T> {
       this.edge,
       this.start,
       this.end,
-      required this.changedOffset,
-      this.percent});
+        this.offset2,
+        this.start2,
+      this.end2,
+      required this.changedOffset,});
 
   /// The data that was dropped onto this [DragTarget].
   final T data;
@@ -535,7 +537,10 @@ class MyDragTargetDetails<T> {
   Offset? start;
   Offset? end;
 
-  double? percent;
+  Offset? offset2;
+
+  Offset? start2;
+  Offset? end2;
 
   Edge? edge;
 

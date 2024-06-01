@@ -82,18 +82,15 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
       data[i].edge = edge;
 
-      if (data[i].data.isVertical) {
+      if (data[i].data.name == ProfileName.vertical) {
         var point = (edge.left + (edge.right - edge.left) / 2).ceil();
         if (!data[i].fixed && !data[i].changedOffset) {
-          data[i].offset =
-              Offset(point.toDouble(), edge.top + (edge.bottom - edge.top) / 2);
+          data[i].offset = Offset(point.toDouble(), edge.top + (edge.bottom - edge.top) / 2);
           data[i].fixed = true;
           data[i].start = Offset(point.toDouble(), edge.top);
           data[i].end = Offset(point.toDouble(), edge.bottom);
-
-          data[i].percent = point / widget.height;
         }
-      } else {
+      } else if (data[i].data.name == ProfileName.horizontal) {
         var point = (edge.top + (edge.bottom - edge.top) / 2).ceil();
         if (!data[i].fixed && !data[i].changedOffset) {
           data[i].offset = Offset(
@@ -101,8 +98,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].fixed = true;
           data[i].start = Offset(edge.left, point.toDouble());
           data[i].end = Offset(edge.right, point.toDouble());
-
-          data[i].percent = point / widget.width;
         }
       }
     }
@@ -333,7 +328,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                 data[i].start!.dy +
                     ((data[i].end!.dy - data[i].start!.dy) / 2));
             data[i].changedOffset = true;
-            data[i].percent = remainingValue / widget.width;
           }
         }
         if (data[i].data.isVertical) {
@@ -387,7 +381,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                 data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2),
                 data[i].offset.dy);
             data[i].changedOffset = true;
-            data[i].percent = remainingValue / widget.height;
           }
         }
         if (!data[i].data.isVertical) {
@@ -447,49 +440,15 @@ class MyPainter extends CustomPainter {
 
     drawAroud(canvas, size, paint);
 
-    List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
-
-    dataCopy.insertAll(0, [
-      MyDragTargetDetails<Profile>(
-        data: Profile(name: ProfileName.edge, isVertical: false),
-        offset: Offset(size.width / 2, 0),
-        fixed: true,
-        changedOffset: false,
-        start: const Offset(0, 0),
-        end: Offset(size.width, 0),
-      ),
-      MyDragTargetDetails<Profile>(
-        data: Profile(name: ProfileName.edge, isVertical: false),
-        offset: Offset(size.width / 2, size.height),
-        fixed: true,
-        changedOffset: false,
-        start: Offset(0, size.height),
-        end: Offset(size.width, size.height),
-      ),
-      MyDragTargetDetails<Profile>(
-        data: Profile(name: ProfileName.edge, isVertical: true),
-        offset: Offset(size.width / 2, 0),
-        fixed: true,
-        changedOffset: false,
-        start: const Offset(0, 0),
-        end: Offset(0, size.height),
-      ),
-      MyDragTargetDetails<Profile>(
-        data: Profile(name: ProfileName.edge, isVertical: true),
-        offset: Offset(size.width / 2, 0),
-        fixed: true,
-        changedOffset: false,
-        start: Offset(size.width, 0),
-        end: Offset(size.width, size.height),
-      ),
-    ]);
-
     for (var i = 0; i < data.length; i++) {
       Edge edge;
       edge = data[i].edge!;
 
-      if (data[i].data.name == ProfileName.vertical) {
-        if (data[i].changedOffset) {
+      if (data[i].data.name == ProfileName.vertical || data[i].data.name == ProfileName.horizontal) {
+        drawSplitter(canvas, paint, data[i].data.isVertical, size,
+            start: data[i].start!,
+            end: data[i].end!);
+        /*if (data[i].changedOffset) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(data[i].offset.dx, edge.top),
               end: Offset(data[i].offset.dx, edge.bottom));
@@ -498,20 +457,10 @@ class MyPainter extends CustomPainter {
               start: Offset(edge.left + (edge.right - edge.left) / 2, edge.top),
               end: Offset(
                   edge.left + (edge.right - edge.left) / 2, edge.bottom));
-        }
-        // if (!data[i].fixed) {
-        //   data[i].offset =
-        //       Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
-        //   data[i].edge = edge;
-        //   data[i].fixed = true;
-        //   data[i].start =
-        //       Offset(edge.left + (edge.right - edge.left) / 2, edge.top);
-        //   data[i].end =
-        //       Offset(edge.left + (edge.right - edge.left) / 2, edge.bottom);
-        // }
+        }*/
       } else
       if (data[i].data.name == ProfileName.horizontal) {
-        if (data[i].changedOffset) {
+        /*if (data[i].changedOffset) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(edge.left, data[i].offset.dy),
               end: Offset(edge.right, data[i].offset.dy));
@@ -519,9 +468,29 @@ class MyPainter extends CustomPainter {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
               start: Offset(edge.left, edge.top + (edge.bottom - edge.top) / 2),
               end: Offset(edge.right, edge.top + (edge.bottom - edge.top) / 2));
+        }*/
+      } else
+      if (data[i].data.name == ProfileName.double) {
+        if (data[i].changedOffset) {
+          drawSplitter(canvas, paint, data[i].data.isVertical, size,
+              start: Offset(data[i].offset.dx, edge.top),
+              end: Offset(data[i].offset.dx, edge.bottom));
+        } else {
+
+          data[i].start = Offset(edge.left + (edge.right - edge.left) / 3, edge.top);
+          data[i].end = Offset(edge.left + (edge.right - edge.left) / 3, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx, (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].start2 = Offset((edge.left + (edge.right - edge.left) / 3) * 2, edge.top);
+          data[i].end2 = Offset((edge.left + (edge.right - edge.left) / 3) * 2, edge.bottom);
+          data[i].offset2 = Offset(data[i].start2!.dx, (data[i].end2!.dy - data[i].start2!.dy) / 2);
+
+          drawSplitter(canvas, paint, data[i].data.isVertical, size,
+              start: data[i].start!, end: data[i].end!);
+
+        drawSplitter(canvas, paint, data[i].data.isVertical, size,
+            start: data[i].start2!, end: data[i].end2!);
         }
       } else
-      if (data[i].data.name == ProfileName.double) {} else
       if (data[i].data.name == ProfileName.fillH) {} else
       if (data[i].data.name == ProfileName.fillV) {} else
       if (data[i].data.name == ProfileName.left) {} else
