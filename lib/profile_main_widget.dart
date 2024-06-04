@@ -115,8 +115,22 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         }
 
       } else
-      if (data[i].data.name == ProfileName.fillH) {} else
-      if (data[i].data.name == ProfileName.fillV) {} else
+      if (data[i].data.name == ProfileName.fillH) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
+      if (data[i].data.name == ProfileName.fillV) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
       if (data[i].data.name == ProfileName.left) {} else
       if (data[i].data.name == ProfileName.right) {} else
       if (data[i].data.name == ProfileName.top) {} else
@@ -127,7 +141,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     }
 
     computeSizeOfSheets(data, Size(widget.width, widget.height));
-
+    rebuildAllChildren(context);
     return Container(
       color: Colors.transparent,
       height: availableHeight,
@@ -145,6 +159,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
               child: ValueListenableBuilder<List<double>?>(
                 valueListenable: verticalSheetsSize,
                 builder: (BuildContext context, value, Widget? child) {
+                  print(value);
                   return VerticalSize(
                     height: widget.height,
                     splits: value, // [25, 25, 25, 25],
@@ -182,6 +197,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
                   child: ValueListenableBuilder<List<double>?>(
                     builder: (BuildContext context, List<double>? value,
                         Widget? child) {
+                      print(value);
+
                       return HorizontalSize(
                         width: widget.width,
                         splits: value, // [150, 75,75],
@@ -205,6 +222,15 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     );
   }
 
+  void rebuildAllChildren(BuildContext context) {
+
+    void rebuild(Element el) {
+      el.markNeedsBuild();
+      el.visitChildren(rebuild);
+    }
+    (context as Element).visitChildren(rebuild);
+  }
+
   Edge findDrawableEdges(List<MyDragTargetDetails<Profile>> allLines,
       MyDragTargetDetails<Profile> target, int index) {
     double x = target.offset.dx;
@@ -216,8 +242,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     double rightEdge = double.infinity;
 
     List<MyDragTargetDetails<Profile>> lines = List.from(allLines);
-    lines.removeRange(index + 4, lines.length);
-
+    // lines.removeRange(index + 4, lines.length);
+    lines.removeLast();
     for (var line in lines) {
       double startX = line.start!.dx;
       double startY = line.start!.dy;
@@ -285,10 +311,12 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     List<MyDragTargetDetails<Profile>> hElement = [];
 
     data.forEach((element) {
-      if (element.data.isVertical) {
-        vElement.add(element);
-      } else {
-        hElement.add(element);
+      if(element.data.name == ProfileName.horizontal || element.data.name == ProfileName.vertical || element.data.name == ProfileName.double){
+        if (element.data.isVertical) {
+          vElement.add(element);
+        } else {
+          hElement.add(element);
+        }
       }
     });
 
@@ -353,7 +381,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
   }
 
   void changeSizeOfSheet(int index, int newValue, {required Axis axis}) {
-    // horizontalSheetsSize = ValueNotifier(hDistances);
 
     if (axis == Axis.horizontal) {
       //مجموع را از اول تا اندکس
@@ -406,6 +433,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         }
       }
     }
+
     if (axis == Axis.vertical) {
       //مجموع را از اول تا اندکس
       var sum = 0.0;
@@ -422,8 +450,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         }
         remainingValue = sum - horizontalSheetsSize.value[index] + newValue;
       }
-
-      // sum += remainingValue;
 
       for (int i = 0; i < data.length; i++) {
         if (data[i].data.isVertical) {
@@ -502,8 +528,6 @@ class MyPainter extends CustomPainter {
     drawAroud(canvas, size, paint);
 
     for (var i = 0; i < data.length; i++) {
-      Edge edge;
-      edge = data[i].edge!;
 
       if (data[i].data.name == ProfileName.vertical || data[i].data.name == ProfileName.horizontal) {
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
@@ -518,8 +542,12 @@ class MyPainter extends CustomPainter {
             start: data[i].start2!, end: data[i].end2!);
 
       } else
-      if (data[i].data.name == ProfileName.fillH) {} else
-      if (data[i].data.name == ProfileName.fillV) {} else
+      if (data[i].data.name == ProfileName.fillH) {
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.fillV) {
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
+      } else
       if (data[i].data.name == ProfileName.left) {} else
       if (data[i].data.name == ProfileName.right) {} else
       if (data[i].data.name == ProfileName.top) {} else
@@ -585,15 +613,17 @@ class MyPainter extends CustomPainter {
       var topEdg = true;
       var bottomEdge = true;
 
-      if (start.dy == 0)
+      if (start.dy == 0) {
         topEdg = true;
-      else
+      } else {
         topEdg = false;
+      }
 
-      if (end.dy == size.height)
+      if (end.dy == size.height) {
         bottomEdge = true;
-      else
+      } else {
         bottomEdge = false;
+      }
 
       var vp1 = Offset((start.dx - z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
       var vp2 = Offset((start.dx + z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
@@ -644,15 +674,17 @@ class MyPainter extends CustomPainter {
       var leftEdg = true;
       var rightEdge = true;
 
-      if (start.dx == 0)
+      if (start.dx == 0) {
         leftEdg = true;
-      else
+      } else {
         leftEdg = false;
+      }
 
-      if (end.dx == size.width)
+      if (end.dx == size.width) {
         rightEdge = true;
-      else
+      } else {
         rightEdge = false;
+      }
 
       var hp1 = Offset(
           start.dx + z2 - (leftEdg ? 0 : z1 / 2), (start.dy - (z2 - (z1 / 2))));
@@ -692,6 +724,76 @@ class MyPainter extends CustomPainter {
       canvas.drawLine(hp2, hp3, paint);
       canvas.drawLine(hp5, hp4, paint);
       canvas.drawLine(hp6, hp7, paint);
+    }
+  }
+
+
+  void drawFill(Canvas canvas, Size size, bool isVertical,
+      {required Offset start, required Offset end}) {
+
+    var fillSheetWidth = 70;
+
+    var paint = Paint();
+    paint.color = Colors.white;
+    paint.style = PaintingStyle.fill;
+
+    var topEdg = true;
+    var bottomEdge = true;
+    var leftEdg = true;
+    var rightEdge = true;
+
+    if (start.dy == 0) {
+      topEdg = true;
+    } else {
+      topEdg = false;
+    }
+
+    if (end.dy == size.height) {
+      bottomEdge = true;
+    } else {
+      bottomEdge = false;
+    }
+
+    if (start.dx == 0) {
+      leftEdg = true;
+    } else {
+      leftEdg = false;
+    }
+
+    if (end.dx == size.width) {
+      rightEdge = true;
+    } else {
+      rightEdge = false;
+    }
+
+    var tlx = start.dx + (leftEdg ? z2 : (z2 - z1/2));
+    var tly = start.dy + (topEdg ? z2 : (z2 - z1/2));
+    var brx = end.dx -  (rightEdge ? z2 : (z2 - z1/2));
+    var bry = end.dy - (bottomEdge ? z2 : (z2 - z1/2));
+
+    var width = end.dx -  (rightEdge ? z2 : (z2 - z1/2)) - tlx;
+    var height = bry - tly;
+
+    var startP = Offset(tlx, tly);
+    var endP = Offset(brx, bry);
+
+    canvas.drawRect(Rect.fromLTWH(tlx, tly, width, height), paint);
+
+    paint.color = Colors.black;
+    paint.strokeWidth = 2;
+
+    if(isVertical){
+      var i = 0;
+      while ((i * fillSheetWidth) < width - fillSheetWidth){
+        i++;
+        canvas.drawLine(Offset(startP.dx + (i * fillSheetWidth), startP.dy) , Offset(startP.dx + (i * fillSheetWidth), endP.dy), paint);
+      }
+    } else {
+      var i = 0;
+      while ((i * fillSheetWidth) < height - fillSheetWidth){
+        i++;
+        canvas.drawLine(Offset(startP.dx, startP.dy + (i * fillSheetWidth)) , Offset(endP.dx, startP.dy + (i * fillSheetWidth)), paint);
+      }
     }
   }
 }

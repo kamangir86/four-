@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fourplus/profile_main_widget.dart';
 import 'package:multi_split_view/multi_split_view.dart';
@@ -84,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.top, isVertical: true),
+                    data: Profile(name: ProfileName.top, isVertical: false),
                     feedback: Image.asset(
                       'assets/top.png',
                       height: 30,
@@ -98,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.right, isVertical: true),
+                    data: Profile(name: ProfileName.right, isVertical: false),
                     feedback: Image.asset(
                       'assets/right.png',
                       height: 30,
@@ -112,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.topRight, isVertical: true),
+                    data: Profile(name: ProfileName.topRight, isVertical: false),
                     feedback: Image.asset(
                       'assets/topRight.png',
                       height: 30,
@@ -126,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.dRight, isVertical: true),
+                    data: Profile(name: ProfileName.dRight, isVertical: false),
                     feedback: Image.asset(
                       'assets/dRight.png',
                       height: 30,
@@ -140,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillV, isVertical: false),
+                    data: Profile(name: ProfileName.fillV, isVertical: true),
                     feedback: Image.asset(
                       'assets/fillV.png',
                       height: 30,
@@ -191,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.left, isVertical: true),
+                    data: Profile(name: ProfileName.left, isVertical: false),
                     feedback: Image.asset(
                       'assets/left.png',
                       height: 30,
@@ -205,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.topLeft, isVertical: true),
+                    data: Profile(name: ProfileName.topLeft, isVertical: false),
                     feedback: Image.asset(
                       'assets/topLeft.png',
                       height: 30,
@@ -219,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.dLeft, isVertical: true),
+                    data: Profile(name: ProfileName.dLeft, isVertical: false),
                     feedback: Image.asset(
                       'assets/dLeft.png',
                       height: 30,
@@ -233,7 +235,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillH, isVertical: true),
+                    data: Profile(name: ProfileName.fillH, isVertical: false),
                     feedback: Image.asset(
                       'assets/fillH.png',
                       height: 30,
@@ -300,10 +302,12 @@ class HorizontalSize extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var sum = 0.0;
-    if (splits != null)
+
+    if (splits != null) {
       splits!.forEach((element) {
         sum += element;
       });
+    }
 
     return SizedBox(
       height: 300,
@@ -357,10 +361,11 @@ class VerticalSize extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var sum = 0.0;
-    if (splits != null)
+    if (splits != null) {
       splits!.forEach((element) {
         sum += element;
       });
+    }
     return SizedBox(
       width: 300,
       height: height,
@@ -441,6 +446,7 @@ class SingleSize extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Text(
+                key: GlobalKey(),
                 size.toInt().toString(),
                 style: const TextStyle(fontSize: 80),
               ),
