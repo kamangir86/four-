@@ -131,13 +131,62 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].fixed = true;
         }
       } else
-      if (data[i].data.name == ProfileName.left) {} else
-      if (data[i].data.name == ProfileName.right) {} else
-      if (data[i].data.name == ProfileName.top) {} else
-      if (data[i].data.name == ProfileName.topRight) {} else
-      if (data[i].data.name == ProfileName.topLeft) {} else
-      if (data[i].data.name == ProfileName.dLeft) {} else
-      if (data[i].data.name == ProfileName.dRight) {}
+      if (data[i].data.name == ProfileName.left) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
+      if (data[i].data.name == ProfileName.right) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
+      if (data[i].data.name == ProfileName.top) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
+      if (data[i].data.name == ProfileName.topRight) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
+      if (data[i].data.name == ProfileName.topLeft) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
+      if (data[i].data.name == ProfileName.dLeft) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      } else
+      if (data[i].data.name == ProfileName.dRight) {
+        if (!data[i].fixed && !data[i].changedOffset){
+          data[i].start = Offset(edge.left, edge.top);
+          data[i].end = Offset(edge.right, edge.bottom);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].fixed = true;
+        }
+      }
     }
 
     computeSizeOfSheets(data, Size(widget.width, widget.height));
@@ -548,11 +597,21 @@ class MyPainter extends CustomPainter {
       if (data[i].data.name == ProfileName.fillV) {
         drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
       } else
-      if (data[i].data.name == ProfileName.left) {} else
-      if (data[i].data.name == ProfileName.right) {} else
-      if (data[i].data.name == ProfileName.top) {} else
-      if (data[i].data.name == ProfileName.topRight) {} else
-      if (data[i].data.name == ProfileName.topLeft) {} else
+      if (data[i].data.name == ProfileName.left) {
+        drawOpenTo(canvas, size, data[i].data.isVertical, left: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.right) {
+        drawOpenTo(canvas, size, data[i].data.isVertical, right: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.top) {
+        drawOpenTo(canvas, size, data[i].data.isVertical, top: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.topRight) {
+        drawOpenTo(canvas, size, data[i].data.isVertical, top: true, right: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.topLeft) {
+        drawOpenTo(canvas, size, data[i].data.isVertical, top: true, left: true, start: data[i].start!, end: data[i].end!);
+      } else
       if (data[i].data.name == ProfileName.dLeft) {} else
       if (data[i].data.name == ProfileName.dRight) {}
     }
@@ -569,7 +628,7 @@ class MyPainter extends CustomPainter {
     // path.addRect(Rect.fromLTWH(z2, z2, size.width - (2 * z2), size.height - (2 * z2)));
 
     var paint2 = Paint();
-    paint2.color = Colors.blue;
+    paint2.color = Colors.blue[200]!;
     paint2.style = PaintingStyle.fill;
 
     var paint3 = Paint();
@@ -771,7 +830,7 @@ class MyPainter extends CustomPainter {
     var brx = end.dx -  (rightEdge ? z2 : (z2 - z1/2));
     var bry = end.dy - (bottomEdge ? z2 : (z2 - z1/2));
 
-    var width = end.dx -  (rightEdge ? z2 : (z2 - z1/2)) - tlx;
+    var width = brx - tlx;
     var height = bry - tly;
 
     var startP = Offset(tlx, tly);
@@ -796,6 +855,137 @@ class MyPainter extends CustomPainter {
       }
     }
   }
+
+  void drawOpenTo(Canvas canvas, Size size, bool isVertical, {bool left = false, bool right = false, bool top = false,
+      required Offset start, required Offset end}) {
+
+    var paint = Paint();
+    paint.strokeWidth = 2;
+    paint.color = Colors.black;
+    paint.style = PaintingStyle.stroke;
+
+    var topEdg = true;
+    var bottomEdge = true;
+    var leftEdg = true;
+    var rightEdge = true;
+
+    if (start.dy == 0) {
+      topEdg = true;
+    } else {
+      topEdg = false;
+    }
+
+    if (end.dy == size.height) {
+      bottomEdge = true;
+    } else {
+      bottomEdge = false;
+    }
+
+    if (start.dx == 0) {
+      leftEdg = true;
+    } else {
+      leftEdg = false;
+    }
+
+    if (end.dx == size.width) {
+      rightEdge = true;
+    } else {
+      rightEdge = false;
+    }
+
+    var tlx = start.dx + (leftEdg ? z2 : (z2 - z1/2)) - z2/2;
+    var tly = start.dy + (topEdg ? z2 : (z2 - z1/2)) - z2/2;
+    var brx = end.dx - (rightEdge ? z2 : (z2 - z1/2)) + z2/2;
+    var bry = end.dy - (bottomEdge ? z2 : (z2 - z1/2)) + z2/2;
+
+    var width = brx - tlx;
+    var height = bry - tly;
+
+    var startP = Offset(tlx, tly);
+    var endP = Offset(brx, bry);
+
+    drawAroudWith(canvas, Size(width, height), tlx, tly);
+
+    paint.color = Colors.blue[900]!;
+    paint.strokeWidth = 4;
+
+    if(left){
+        canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2) , Offset(endP.dx, endP.dy - height / 4), paint);
+        canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2) , Offset(endP.dx, endP.dy -  3 * height / 4), paint);
+        drawHandle(canvas, size, startP.dx + 30, startP.dy + height / 2);
+        drawLola(canvas, size, endP.dx, endP.dy - height / 4, endP.dy -  3 * height / 4, false);
+    }
+
+    if(right){
+      canvas.drawLine(Offset(startP.dx, startP.dy + height / 4) , Offset(endP.dx- 30, endP.dy - height / 2), paint);
+      canvas.drawLine(Offset(startP.dx, startP.dy + 3 * height / 4) , Offset(endP.dx - 30, endP.dy - height / 2 ), paint);
+      drawHandle(canvas, size, endP.dx - 30, endP.dy - height / 2 );
+      drawLola(canvas, size, startP.dx, startP.dy + height / 4, startP.dy + 3 * height / 4, false);
+    }
+
+    if(top){
+      canvas.drawLine(Offset(endP.dx - width / 2, startP.dy + 30) , Offset(endP.dx - width / 4, endP.dy), paint);
+      canvas.drawLine(Offset(endP.dx - width / 2, startP.dy + 30) , Offset(endP.dx - 3 * width / 4, endP.dy), paint);
+    }
+  }
+
+  void drawAroudWith(Canvas canvas, Size size, double x, double y) {
+
+    var paint = Paint();
+    paint.strokeWidth = 2;
+    paint.color = Colors.black;
+    paint.style = PaintingStyle.stroke;
+
+    var paint2 = Paint();
+    paint2.color = Colors.blue[200]!;
+    paint2.style = PaintingStyle.fill;
+
+    var paint3 = Paint();
+    paint3.color = Colors.white;
+    paint3.style = PaintingStyle.fill;
+
+    canvas.drawRect(Rect.fromLTWH(x,y, size.width, size.height), paint3);
+    canvas.drawRect(Rect.fromLTWH(x,y, size.width, size.height), paint);
+    canvas.drawRect(Rect.fromLTWH(x+z1, y+z1, size.width - (2 * z1), size.height - (2 * z1)), paint);
+    canvas.drawRect(Rect.fromLTWH(x+z2, y+z2, size.width - (2 * z2), size.height - (2 * z2)), paint2);
+    canvas.drawRect(Rect.fromLTWH(x+z2, y+z2, size.width - (2 * z2), size.height - (2 * z2)), paint);
+
+    canvas.drawLine(Offset(x,y), Offset(x+z2, y+z2), paint);
+    canvas.drawLine(Offset(x+size.width, y), Offset(x+size.width - z2, y+z2), paint);
+    canvas.drawLine(Offset(x, y+size.height), Offset(x+z2, y+size.height - z2), paint);
+    canvas.drawLine(Offset(x+size.width, y+size.height), Offset(x+size.width - z2, y+size.height - z2), paint);
+    canvas.drawLine(Offset(x+size.width, y+size.height), Offset(x+size.width - z2, y+size.height - z2), paint);
+  }
+  void drawHandle(Canvas canvas, Size size, double x, double y) {
+
+    var paint = Paint();
+    paint.strokeWidth = 2;
+    paint.color = Colors.blueGrey;
+    paint.style = PaintingStyle.fill;
+
+    canvas.drawRect(Rect.fromLTWH(x-15,y-45, 30, 90), paint);
+    canvas.drawRect(Rect.fromLTWH(x-8,y+45, 16, 30), paint);
+  }
+  void drawLola(Canvas canvas, Size size, double x, double y1 , double y2, bool isDoor) {
+
+    var paint = Paint();
+    paint.strokeWidth = 2;
+    paint.color = Colors.blueGrey;
+    paint.style = PaintingStyle.fill;
+
+    canvas.drawRect(Rect.fromLTWH(x-10, y1-45, 20, 40), paint);
+    canvas.drawRect(Rect.fromLTWH(x-10, y1+5, 20, 40), paint);
+
+    canvas.drawRect(Rect.fromLTWH(x-10, y2-45, 20, 40), paint);
+    canvas.drawRect(Rect.fromLTWH(x-10, y2+5, 20, 40), paint);
+
+    if(isDoor){
+      canvas.drawRect(Rect.fromLTWH(x-10, ( y1 + (y2 - y1) / 2)-45, 20, 40), paint);
+      canvas.drawRect(Rect.fromLTWH(x-10, (y1 + (y2 - y1) / 2)+5, 20, 40), paint);
+    }
+
+  }
+
 }
 
 class Edge {

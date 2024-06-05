@@ -8,10 +8,17 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,10 +28,53 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home:MyHomePage(title: 'Flutter Demo Home Page')
     );
   }
 }
+
+class GetSizeWidget extends StatelessWidget {
+  var heightController = TextEditingController();
+  var widthController = TextEditingController();
+
+  GetSizeWidget(this.onChangeSize, {super.key});
+  Function(Size) onChangeSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20.0),
+            child: TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'عرض',
+              ),
+              controller: widthController,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20.0),
+            child: TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'ارتفاع'
+              ),
+              controller: heightController,
+            ),
+          ),
+          FilledButton(onPressed: (){
+            onChangeSize(Size(int.parse(widthController.text).toDouble(), int.parse(heightController.text).toDouble()));
+          }, child: Text("تایید"))
+        ],
+      ),
+    );
+  }
+}
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -36,14 +86,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var size = Size(1500, 1200);
+
+  bool haveSize = false;
+  Size size = Size(0,0);
+
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.grey[400],
-        body: Column(
+        body: !haveSize ? GetSizeWidget((size) {
+          setState(() {
+            haveSize = true;
+            this.size = size;
+          });
+        },) : Column(
           children: [
             Container(
               height: 60,
@@ -53,6 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    BackButton(onPressed: (){
+                      setState(() {
+                        haveSize = false;
+                      });
+                    },),
+                    const Spacer(),
                     IconButton(
                         onPressed: () {
                           // myList.removeLast();
