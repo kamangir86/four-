@@ -28,6 +28,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
   var sizeOfSizeWidget = 300.0;
 
+  int? indexOfSameEdge;
+
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +139,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.right) {
@@ -145,6 +148,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.top) {
@@ -153,6 +157,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.topRight) {
@@ -161,6 +166,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.topLeft) {
@@ -169,6 +175,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.dLeft) {
@@ -177,6 +184,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.dRight) {
@@ -185,12 +193,14 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       }
     }
 
+    removeSameEdgeProfileIfNeeded();
     computeSizeOfSheets(data, Size(widget.width, widget.height));
-    rebuildAllChildren(context);
+
     return Container(
       color: Colors.transparent,
       height: availableHeight,
@@ -271,14 +281,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     );
   }
 
-  void rebuildAllChildren(BuildContext context) {
-
-    void rebuild(Element el) {
-      el.markNeedsBuild();
-      el.visitChildren(rebuild);
-    }
-    (context as Element).visitChildren(rebuild);
-  }
 
   Edge findDrawableEdges(List<MyDragTargetDetails<Profile>> allLines,
       MyDragTargetDetails<Profile> target, int index) {
@@ -289,6 +291,11 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     double bottomEdge = double.negativeInfinity;
     double leftEdge = double.negativeInfinity;
     double rightEdge = double.infinity;
+
+    bool topGap = false;
+    bool bottomGap = false;
+    bool leftGap = false;
+    bool rightGap = false;
 
     List<MyDragTargetDetails<Profile>> lines = List.from(allLines);
     // lines.removeRange(index + 4, lines.length);
@@ -303,9 +310,11 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       if (startY == endY && (x >= startX && x <= endX)) {
         if (y >= startY && (x >= startX && x <= endX)) {
           bottomEdge = max(bottomEdge, endY);
+          bottomGap = line.data.haveGap;
         }
         if (y <= endY && (x >= startX && x <= endX)) {
           topEdge = min(topEdge, startY);
+          topGap = line.data.haveGap;
         }
       }
 
@@ -313,9 +322,11 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       if (startX == endX && (y >= startY && y <= endY)) {
         if (x >= startX && (y >= startY && y <= endY)) {
           leftEdge = max(leftEdge, startX);
+          leftGap = line.data.haveGap;
         }
         if (x <= endX && (y >= startY && y <= endY)) {
           rightEdge = min(rightEdge, endX);
+          rightGap = line.data.haveGap;
         }
       }
 
@@ -349,7 +360,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     }
 
     return Edge(
-        top: bottomEdge, bottom: topEdge, left: leftEdge, right: rightEdge);
+        top: bottomEdge, bottom: topEdge, left: leftEdge, right: rightEdge, topGap: topGap, bottomGap: bottomGap, leftGap: leftGap, rightGap: rightGap,
+    );
   }
 
   void computeSizeOfSheets(List<MyDragTargetDetails<Profile>> data, Size size) {
@@ -547,6 +559,23 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
     setState(() {});
   }
+
+  int? findIndexOfSameEdge(Edge edge) {
+    int? index;
+    for (var i = 0; i < data.length - 1; i++) {
+      if(data[i].edge!.right == edge.right && data[i].edge!.left == edge.left && data[i].edge!.top == edge.top && data[i].edge!.bottom == edge.bottom) {
+        index = i;
+      }
+    }
+    return index;
+  }
+
+  void removeSameEdgeProfileIfNeeded() {
+    if(indexOfSameEdge != null){
+      data.removeAt(indexOfSameEdge!);
+      indexOfSameEdge = null;
+    }
+  }
 }
 
 class MyPainter extends CustomPainter {
@@ -581,21 +610,21 @@ class MyPainter extends CustomPainter {
       if (data[i].data.name == ProfileName.vertical || data[i].data.name == ProfileName.horizontal) {
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
             start: data[i].start!,
-            end: data[i].end!);
+            end: data[i].end!, edge: data[i].edge!);
       } else
       if (data[i].data.name == ProfileName.double) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: data[i].start!, end: data[i].end!);
+              start: data[i].start!, end: data[i].end!, edge: data[i].edge!);
 
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
-            start: data[i].start2!, end: data[i].end2!);
+            start: data[i].start2!, end: data[i].end2!, edge: data[i].edge!);
 
       } else
       if (data[i].data.name == ProfileName.fillH) {
-        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!, edge: data[i].edge!);
       } else
       if (data[i].data.name == ProfileName.fillV) {
-        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!, edge: data[i].edge!);
       } else
       if (data[i].data.name == ProfileName.left) {
         drawOpenTo(canvas, size, data[i].data.isVertical, left: true, start: data[i].start!, end: data[i].end!);
@@ -612,8 +641,12 @@ class MyPainter extends CustomPainter {
       if (data[i].data.name == ProfileName.topLeft) {
         drawOpenTo(canvas, size, data[i].data.isVertical, top: true, left: true, start: data[i].start!, end: data[i].end!);
       } else
-      if (data[i].data.name == ProfileName.dLeft) {} else
-      if (data[i].data.name == ProfileName.dRight) {}
+      if (data[i].data.name == ProfileName.dLeft) {
+        drawOpenTo(canvas, size, data[i].data.isVertical, isDoor: true, left: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.dRight) {
+        drawOpenTo(canvas, size, data[i].data.isVertical, isDoor: true, right: true, start: data[i].start!, end: data[i].end!);
+      }
     }
   }
 
@@ -658,7 +691,7 @@ class MyPainter extends CustomPainter {
   }
 
   void drawSplitter(Canvas canvas, Paint paint, bool isVertical, Size size,
-      {required Offset start, required Offset end}) {
+      {required Offset start, required Offset end, required Edge edge}) {
     paint.style = PaintingStyle.stroke;
     paint.color = Colors.black;
 
@@ -684,8 +717,8 @@ class MyPainter extends CustomPainter {
         bottomEdge = false;
       }
 
-      var vp1 = Offset((start.dx - z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
-      var vp2 = Offset((start.dx + z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
+      var vp1 = Offset((start.dx - z1 / 2), start.dy + (topEdg ? z1 : z1 / 2) + (edge.topGap ? z1 /3 : 0));
+      var vp2 = Offset((start.dx + z1 / 2), start.dy + (topEdg ? z1 : z1 / 2) + (edge.topGap ? z1 /3 : 0));
       var vp3 = Offset((start.dx + (z2 - (z1 / 2))),
           start.dy + (z2 - (topEdg ? 0 : z1 / 2)));
       var vp4 = Offset((end.dx + (z2 - (z1 / 2))),
@@ -786,9 +819,8 @@ class MyPainter extends CustomPainter {
     }
   }
 
-
   void drawFill(Canvas canvas, Size size, bool isVertical,
-      {required Offset start, required Offset end}) {
+      {required Offset start, required Offset end, required  Edge edge}) {
 
     var fillSheetWidth = 70;
 
@@ -855,8 +887,7 @@ class MyPainter extends CustomPainter {
       }
     }
   }
-
-  void drawOpenTo(Canvas canvas, Size size, bool isVertical, {bool left = false, bool right = false, bool top = false,
+  void drawOpenTo(Canvas canvas, Size size, bool isVertical, {bool left = false, bool right = false, bool top = false, bool isDoor = false,
       required Offset start, required Offset end}) {
 
     var paint = Paint();
@@ -910,17 +941,23 @@ class MyPainter extends CustomPainter {
     paint.strokeWidth = 4;
 
     if(left){
-        canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2) , Offset(endP.dx, endP.dy - height / 4), paint);
-        canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2) , Offset(endP.dx, endP.dy -  3 * height / 4), paint);
-        drawHandle(canvas, size, startP.dx + 30, startP.dy + height / 2);
-        drawLola(canvas, size, endP.dx, endP.dy - height / 4, endP.dy -  3 * height / 4, false);
+        canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2 + (isDoor ? (height / 8) : 0)) , Offset(endP.dx, endP.dy - height / 4), paint);
+        canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2 - (isDoor ? (height / 8) : 0)) , Offset(endP.dx, endP.dy -  3 * height / 4), paint);
+        if(isDoor) {
+          canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2 + (height / 8)) , Offset(startP.dx + 30, startP.dy + height / 2 - (height / 8)), paint);
+        }
+        drawHandle(canvas, startP.dx + 30, startP.dy + height / 2, isDoor, false);
+        drawLola(canvas, size, endP.dx, endP.dy - height / 4, endP.dy -  3 * height / 4, isDoor);
     }
 
     if(right){
-      canvas.drawLine(Offset(startP.dx, startP.dy + height / 4) , Offset(endP.dx- 30, endP.dy - height / 2), paint);
-      canvas.drawLine(Offset(startP.dx, startP.dy + 3 * height / 4) , Offset(endP.dx - 30, endP.dy - height / 2 ), paint);
-      drawHandle(canvas, size, endP.dx - 30, endP.dy - height / 2 );
-      drawLola(canvas, size, startP.dx, startP.dy + height / 4, startP.dy + 3 * height / 4, false);
+      canvas.drawLine(Offset(startP.dx, startP.dy + height / 4) , Offset(endP.dx- 30, endP.dy - height / 2 - (isDoor ? (height / 8) : 0)), paint);
+      canvas.drawLine(Offset(startP.dx, startP.dy + 3 * height / 4) , Offset(endP.dx - 30, endP.dy - height / 2 + (isDoor ? (height / 8) : 0)), paint);
+      if(isDoor) {
+        canvas.drawLine(Offset(endP.dx- 30, endP.dy - height / 2 - (height / 8)) , Offset(endP.dx - 30, endP.dy - height / 2 + (height / 8)), paint);
+      }
+      drawHandle(canvas, endP.dx - 30, endP.dy - height / 2, isDoor, true);
+      drawLola(canvas, size, startP.dx, startP.dy + height / 4, startP.dy + 3 * height / 4, isDoor);
     }
 
     if(top){
@@ -928,7 +965,6 @@ class MyPainter extends CustomPainter {
       canvas.drawLine(Offset(endP.dx - width / 2, startP.dy + 30) , Offset(endP.dx - 3 * width / 4, endP.dy), paint);
     }
   }
-
   void drawAroudWith(Canvas canvas, Size size, double x, double y) {
 
     var paint = Paint();
@@ -956,15 +992,24 @@ class MyPainter extends CustomPainter {
     canvas.drawLine(Offset(x+size.width, y+size.height), Offset(x+size.width - z2, y+size.height - z2), paint);
     canvas.drawLine(Offset(x+size.width, y+size.height), Offset(x+size.width - z2, y+size.height - z2), paint);
   }
-  void drawHandle(Canvas canvas, Size size, double x, double y) {
+  void drawHandle(Canvas canvas, double x, double y, bool isDoor, bool isRight) {
 
     var paint = Paint();
     paint.strokeWidth = 2;
     paint.color = Colors.blueGrey;
     paint.style = PaintingStyle.fill;
 
-    canvas.drawRect(Rect.fromLTWH(x-15,y-45, 30, 90), paint);
-    canvas.drawRect(Rect.fromLTWH(x-8,y+45, 16, 30), paint);
+    if(isDoor){
+      canvas.drawRect(Rect.fromLTWH(x-17,y-80, 34, 160), paint);
+      if(isRight) {
+        canvas.drawRect(Rect.fromLTWH(x-110, y - 15, 110, 20), paint);
+      } else {
+        canvas.drawRect(Rect.fromLTWH(x, y-15, 110, 20), paint);
+      }
+    } else {
+      canvas.drawRect(Rect.fromLTWH(x-15,y-45, 30, 90), paint);
+      canvas.drawRect(Rect.fromLTWH(x-8,y+45, 16, 35), paint);
+    }
   }
   void drawLola(Canvas canvas, Size size, double x, double y1 , double y2, bool isDoor) {
 
@@ -993,12 +1038,21 @@ class Edge {
   double bottom;
   double left;
   double right;
+  bool topGap;
+  bool bottomGap;
+  bool leftGap;
+  bool rightGap;
 
   Edge(
       {required this.top,
       required this.bottom,
       required this.left,
-      required this.right});
+      required this.right,
+      this.topGap = false,
+      this.bottomGap = false,
+      this.leftGap = false,
+      this.rightGap = false,
+      });
 }
 
 class Line {

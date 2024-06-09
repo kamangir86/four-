@@ -50,7 +50,7 @@ class GetSizeWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20.0),
             child: TextField(
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'عرض',
               ),
               controller: widthController,
@@ -60,7 +60,7 @@ class GetSizeWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20.0),
             child: TextField(
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'ارتفاع'
               ),
               controller: heightController,
@@ -150,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.top, isVertical: false),
+                    data: Profile(name: ProfileName.top, isVertical: false, haveGap: true),
                     feedback: Image.asset(
                       'assets/top.png',
                       height: 30,
@@ -164,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.right, isVertical: false),
+                    data: Profile(name: ProfileName.right, isVertical: false, haveGap: true),
                     feedback: Image.asset(
                       'assets/right.png',
                       height: 30,
@@ -178,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.topRight, isVertical: false),
+                    data: Profile(name: ProfileName.topRight, isVertical: false, haveGap: true),
                     feedback: Image.asset(
                       'assets/topRight.png',
                       height: 30,
@@ -192,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.dRight, isVertical: false),
+                    data: Profile(name: ProfileName.dRight, isVertical: false, haveGap: true),
                     feedback: Image.asset(
                       'assets/dRight.png',
                       height: 30,
@@ -257,7 +257,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.left, isVertical: false),
+                    data: Profile(name: ProfileName.left, isVertical: false, haveGap: true),
                     feedback: Image.asset(
                       'assets/left.png',
                       height: 30,
@@ -271,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.topLeft, isVertical: false),
+                    data: Profile(name: ProfileName.topLeft, isVertical: false, haveGap: true),
                     feedback: Image.asset(
                       'assets/topLeft.png',
                       height: 30,
@@ -285,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.dLeft, isVertical: false),
+                    data: Profile(name: ProfileName.dLeft, isVertical: false, haveGap: true),
                     feedback: Image.asset(
                       'assets/dLeft.png',
                       height: 30,
@@ -620,9 +620,10 @@ class MyDragTargetDetails<T> {
 
 class Profile {
   ProfileName name;
+  bool haveGap;
   bool isVertical;
 
-  Profile({required this.name, required this.isVertical});
+  Profile({required this.name, required this.isVertical, this.haveGap = false});
 }
 
 enum ProfileName{
