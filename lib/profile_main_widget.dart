@@ -614,31 +614,14 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
   }
 
   void removeSameEdgeProfileIfNeeded() {
-    var listOfChildIndex= [];
 
     if(indexOfSameEdge != null){
       data.last.parentIndex = null;
-      // for(var d = 0; d < data.length-1; d++){
-      //   if(data[d].edge!.left <= data[indexOfSameEdge!].edge!.left &&
-      //   data[d].edge!.right >= data[indexOfSameEdge!].edge!.right &&
-      //   data[d].edge!.bottom >= data[indexOfSameEdge!].edge!.bottom &&
-      //   data[d].edge!.top <= data[indexOfSameEdge!].edge!.top){
-      //     if(d != indexOfSameEdge) {
-      //       listOfChildIndex.add(d);
-      //     }
-      //   }
-      // }
 
       data.removeWhere((e)=> e.parentIndex == indexOfSameEdge);
       data.removeAt(indexOfSameEdge!);
 
       indexOfSameEdge = null;
-
-      // if(listOfChildIndex.isNotEmpty){
-      //   for (var i in listOfChildIndex) {
-      //     data.removeAt(i);
-      //   }
-      // }
     }
   }
 }
@@ -651,6 +634,7 @@ class MyPainter extends CustomPainter {
   List<MyDragTargetDetails<Profile>> data;
   var z1 = 0.0;
   var z2 = 0.0;
+  var gap = 0.0;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -662,6 +646,7 @@ class MyPainter extends CustomPainter {
 
     z1 = sizeScale.toDouble();
     z2 = z1 + (z1 / 3);
+    gap = z2/2;
 
     var paint = Paint();
     paint.strokeWidth = 2;
@@ -675,15 +660,14 @@ class MyPainter extends CustomPainter {
       if (data[i].data.name == ProfileName.vertical || data[i].data.name == ProfileName.horizontal) {
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
             start: data[i].start!,
-            end: data[i].end!);
+            end: data[i].end!, parentEdge: data[i].parentIndex != null ? data[data[i].parentIndex!].edge! : null);
       } else
       if (data[i].data.name == ProfileName.double) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: data[i].start!, end: data[i].end!);
+              start: data[i].start!, end: data[i].end!, parentEdge: data[i].parentIndex != null ? data[data[i].parentIndex!].edge! : null);
 
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
-            start: data[i].start2!, end: data[i].end2!);
-
+            start: data[i].start2!, end: data[i].end2!, parentEdge: data[i].parentIndex != null ? data[data[i].parentIndex!].edge! : null);
       } else
       if (data[i].data.name == ProfileName.fillH) {
         drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
@@ -756,7 +740,7 @@ class MyPainter extends CustomPainter {
   }
 
   void drawSplitter(Canvas canvas, Paint paint, bool isVertical, Size size,
-      {required Offset start, required Offset end}) {
+      {required Offset start, required Offset end, Edge? parentEdge}) {
     paint.style = PaintingStyle.stroke;
     paint.color = Colors.black;
 
@@ -767,33 +751,45 @@ class MyPainter extends CustomPainter {
     paint2.style = PaintingStyle.fill;
 
     if (isVertical) {
-      var topEdg = true;
-      var bottomEdge = true;
+      var topMainEdg = true;
+      var bottomMainEdge = true;
+      var topParentEdge = false;
+      var bottomParentEdge = false;
 
       if (start.dy == 0) {
-        topEdg = true;
+        topMainEdg = true;
       } else {
-        topEdg = false;
+        topMainEdg = false;
       }
 
       if (end.dy == size.height) {
-        bottomEdge = true;
+        bottomMainEdge = true;
       } else {
-        bottomEdge = false;
+        bottomMainEdge = false;
       }
 
-      var vp1 = Offset((start.dx - z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
-      var vp2 = Offset((start.dx + z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
+      if(parentEdge != null){
+        if(parentEdge.top == start.dy){
+          topParentEdge = true;
+        }
+        if(parentEdge.bottom == end.dy){
+          bottomParentEdge = true;
+        }
+      }
+
+
+      var vp1 = Offset((start.dx - z1 / 2), start.dy + (topMainEdg ? z1 : z1 / 2) + (topParentEdge ? gap : 0));
+      var vp2 = Offset((start.dx + z1 / 2), start.dy + (topMainEdg ? z1 : z1 / 2) + (topParentEdge ? gap : 0));
       var vp3 = Offset((start.dx + (z2 - (z1 / 2))),
-          start.dy + (z2 - (topEdg ? 0 : z1 / 2)));
+          start.dy + (z2 - (topMainEdg ? 0 : z1 / 2)) + (topParentEdge ? gap : 0));
       var vp4 = Offset((end.dx + (z2 - (z1 / 2))),
-          end.dy - (z2 - (bottomEdge ? 0 : z1 / 2)));
-      var vp5 = Offset((end.dx + z1 / 2), end.dy - (bottomEdge ? z1 : z1 / 2));
-      var vp6 = Offset((end.dx - z1 / 2), end.dy - (bottomEdge ? z1 : z1 / 2));
+          end.dy - (z2 - (bottomMainEdge ? 0 : z1 / 2)) - (bottomParentEdge ? gap : 0));
+      var vp5 = Offset((end.dx + z1 / 2), end.dy - (bottomMainEdge ? z1 : z1 / 2) - (bottomParentEdge ? gap : 0));
+      var vp6 = Offset((end.dx - z1 / 2), end.dy - (bottomMainEdge ? z1 : z1 / 2) - (bottomParentEdge ? gap : 0));
       var vp7 = Offset((end.dx - (z2 - (z1 / 2))),
-          end.dy - (z2 - (bottomEdge ? 0 : z1 / 2)));
+          end.dy - (z2 - (bottomMainEdge ? 0 : z1 / 2)) - (bottomParentEdge ? gap : 0));
       var vp8 = Offset((start.dx - (z2 - (z1 / 2))),
-          start.dy + (z2 - (topEdg ? 0 : z1 / 2)));
+          start.dy + (z2 - (topMainEdg ? 0 : z1 / 2)) + (topParentEdge ? gap : 0));
 
       path.moveTo(vp1.dx, vp1.dy);
       path.lineTo(vp2.dx, vp2.dy);
@@ -828,33 +824,44 @@ class MyPainter extends CustomPainter {
 
       canvas.drawParagraph(paragraph, end);
     } else {
-      var leftEdg = true;
-      var rightEdge = true;
+      var leftMainEdg = true;
+      var rightMainEdge = true;
+      var leftParentEdge = false;
+      var rightParentEdge = false;
 
       if (start.dx == 0) {
-        leftEdg = true;
+        leftMainEdg = true;
       } else {
-        leftEdg = false;
+        leftMainEdg = false;
       }
 
       if (end.dx == size.width) {
-        rightEdge = true;
+        rightMainEdge = true;
       } else {
-        rightEdge = false;
+        rightMainEdge = false;
+      }
+
+      if(parentEdge != null){
+        if(parentEdge.left == start.dx){
+          leftParentEdge = true;
+        }
+        if(parentEdge.right == end.dx){
+          rightParentEdge = true;
+        }
       }
 
       var hp1 = Offset(
-          start.dx + z2 - (leftEdg ? 0 : z1 / 2), (start.dy - (z2 - (z1 / 2))));
+          start.dx + z2 - (leftMainEdg ? 0 : z1 / 2) + (leftParentEdge ? gap : 0), (start.dy - (z2 - (z1 / 2))));
       var hp2 = Offset(
-          end.dx - (z2) + (rightEdge ? 0 : z1 / 2), (end.dy - (z2 - (z1 / 2))));
-      var hp3 = Offset(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy - z1 / 2));
-      var hp4 = Offset(end.dx - (rightEdge ? z1 : z1 / 2), (end.dy + z1 / 2));
+          end.dx - (z2) + (rightMainEdge ? 0 : z1 / 2) - (rightParentEdge ? gap : 0), (end.dy - (z2 - (z1 / 2))));
+      var hp3 = Offset(end.dx - (rightMainEdge ? z1 : z1 / 2) - (rightParentEdge ? gap : 0), (end.dy - z1 / 2));
+      var hp4 = Offset(end.dx - (rightMainEdge ? z1 : z1 / 2) - (rightParentEdge ? gap : 0), (end.dy + z1 / 2));
       var hp5 = Offset(
-          end.dx - (z2) + (rightEdge ? 0 : z1 / 2), (end.dy + (z2 - (z1 / 2))));
+          end.dx - (z2) + (rightMainEdge ? 0 : z1 / 2) - (rightParentEdge ? gap : 0), (end.dy + (z2 - (z1 / 2))));
       var hp6 = Offset(
-          start.dx + z2 - (leftEdg ? 0 : z1 / 2), (start.dy + (z2 - (z1 / 2))));
-      var hp7 = Offset(start.dx + (leftEdg ? z1 : z1 / 2), (start.dy + z1 / 2));
-      var hp8 = Offset(start.dx + (leftEdg ? z1 : z1 / 2), (start.dy - z1 / 2));
+          start.dx + z2 - (leftMainEdg ? 0 : z1 / 2) + (leftParentEdge ? gap : 0), (start.dy + (z2 - (z1 / 2))));
+      var hp7 = Offset(start.dx + (leftMainEdg ? z1 : z1 / 2) + (leftParentEdge ? gap : 0), (start.dy + z1 / 2));
+      var hp8 = Offset(start.dx + (leftMainEdg ? z1 : z1 / 2) + (leftParentEdge ? gap : 0), (start.dy - z1 / 2));
 
       path.moveTo(hp1.dx, hp1.dy);
       path.lineTo(hp2.dx, hp2.dy);
@@ -1103,20 +1110,12 @@ class Edge {
   double bottom;
   double left;
   double right;
-  bool topGap;
-  bool bottomGap;
-  bool leftGap;
-  bool rightGap;
 
   Edge(
       {required this.top,
       required this.bottom,
       required this.left,
       required this.right,
-      this.topGap = false,
-      this.bottomGap = false,
-      this.leftGap = false,
-      this.rightGap = false,
       });
 }
 
