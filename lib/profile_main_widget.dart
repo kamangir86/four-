@@ -670,10 +670,10 @@ class MyPainter extends CustomPainter {
             start: data[i].start2!, end: data[i].end2!, parentEdge: data[i].parentIndex != null ? data[data[i].parentIndex!].edge! : null);
       } else
       if (data[i].data.name == ProfileName.fillH) {
-        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!, parentEdge: data[i].parentIndex != null ? data[data[i].parentIndex!].edge! : null);
       } else
       if (data[i].data.name == ProfileName.fillV) {
-        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!, parentEdge: data[i].parentIndex != null ? data[data[i].parentIndex!].edge! : null);
       } else
       if (data[i].data.name == ProfileName.left) {
         drawOpenTo(canvas, size, data[i].data.isVertical, left: true, start: data[i].start!, end: data[i].end!);
@@ -695,6 +695,30 @@ class MyPainter extends CustomPainter {
       } else
       if (data[i].data.name == ProfileName.dRight) {
         drawOpenTo(canvas, size, data[i].data.isVertical, isDoor: true, right: true, start: data[i].start!, end: data[i].end!);
+      }
+    }
+
+    for (var i = 0; i < data.length; i++){
+      if (data[i].data.name == ProfileName.left) {
+        drawHandleAndLolas(canvas, size, data[i].data.isVertical, left: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.right) {
+        drawHandleAndLolas(canvas, size, data[i].data.isVertical, right: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.top) {
+        drawHandleAndLolas(canvas, size, data[i].data.isVertical, top: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.topRight) {
+        drawHandleAndLolas(canvas, size, data[i].data.isVertical, top: true, right: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.topLeft) {
+        drawHandleAndLolas(canvas, size, data[i].data.isVertical, top: true, left: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.dLeft) {
+        drawHandleAndLolas(canvas, size, data[i].data.isVertical, isDoor: true, left: true, start: data[i].start!, end: data[i].end!);
+      } else
+      if (data[i].data.name == ProfileName.dRight) {
+        drawHandleAndLolas(canvas, size, data[i].data.isVertical, isDoor: true, right: true, start: data[i].start!, end: data[i].end!);
       }
     }
   }
@@ -892,7 +916,7 @@ class MyPainter extends CustomPainter {
   }
 
   void drawFill(Canvas canvas, Size size, bool isVertical,
-      {required Offset start, required Offset end}) {
+      {required Offset start, required Offset end, Edge? parentEdge}) {
 
     var fillSheetWidth = 70;
 
@@ -904,6 +928,11 @@ class MyPainter extends CustomPainter {
     var bottomEdge = true;
     var leftEdg = true;
     var rightEdge = true;
+
+    var topParentEdge = false;
+    var bottomParentEdge = false;
+    var leftParentEdge = false;
+    var rightParentEdge = false;
 
     if (start.dy == 0) {
       topEdg = true;
@@ -929,10 +958,28 @@ class MyPainter extends CustomPainter {
       rightEdge = false;
     }
 
-    var tlx = start.dx + (leftEdg ? z2 : (z2 - z1/2));
-    var tly = start.dy + (topEdg ? z2 : (z2 - z1/2));
-    var brx = end.dx -  (rightEdge ? z2 : (z2 - z1/2));
-    var bry = end.dy - (bottomEdge ? z2 : (z2 - z1/2));
+    if(parentEdge != null){
+      if(parentEdge.left == start.dx){
+        leftParentEdge = true;
+      }
+      if(parentEdge.right == end.dx){
+        rightParentEdge = true;
+      }
+    }
+
+    if(parentEdge != null){
+      if(parentEdge.top == start.dy){
+        topParentEdge = true;
+      }
+      if(parentEdge.bottom == end.dy){
+        bottomParentEdge = true;
+      }
+    }
+
+    var tlx = start.dx + (leftEdg ? z2 : (z2 - z1/2)) + (leftParentEdge ? gap : 0);
+    var tly = start.dy + (topEdg ? z2 : (z2 - z1/2)) + (topParentEdge ? gap : 0);
+    var brx = end.dx -  (rightEdge ? z2 : (z2 - z1/2)) - (rightParentEdge ? gap : 0);
+    var bry = end.dy - (bottomEdge ? z2 : (z2 - z1/2)) - (bottomParentEdge ? gap : 0);
 
     var width = brx - tlx;
     var height = bry - tly;
@@ -960,6 +1007,86 @@ class MyPainter extends CustomPainter {
     }
   }
   void drawOpenTo(Canvas canvas, Size size, bool isVertical, {bool left = false, bool right = false, bool top = false, bool isDoor = false,
+      required Offset start, required Offset end}) {
+
+    var paint = Paint();
+    paint.strokeWidth = 2;
+    paint.color = Colors.black;
+    paint.style = PaintingStyle.stroke;
+
+    var topEdg = true;
+    var bottomEdge = true;
+    var leftEdg = true;
+    var rightEdge = true;
+
+
+    if (start.dy == 0) {
+      topEdg = true;
+    } else {
+      topEdg = false;
+    }
+
+    if (end.dy == size.height) {
+      bottomEdge = true;
+    } else {
+      bottomEdge = false;
+    }
+
+    if (start.dx == 0) {
+      leftEdg = true;
+    } else {
+      leftEdg = false;
+    }
+
+    if (end.dx == size.width) {
+      rightEdge = true;
+    } else {
+      rightEdge = false;
+    }
+
+    var tlx = start.dx + (leftEdg ? z2 : (z2 - z1/2)) - z2/2;
+    var tly = start.dy + (topEdg ? z2 : (z2 - z1/2)) - z2/2;
+    var brx = end.dx - (rightEdge ? z2 : (z2 - z1/2)) + z2/2;
+    var bry = end.dy - (bottomEdge ? z2 : (z2 - z1/2)) + z2/2;
+
+    var width = brx - tlx;
+    var height = bry - tly;
+
+    var startP = Offset(tlx, tly);
+    var endP = Offset(brx, bry);
+
+    drawAroundWith(canvas, Size(width, height), tlx, tly);
+
+    // paint.color = Colors.blue[900]!;
+    // paint.strokeWidth = 4;
+    //
+    // if(left){
+    //     canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2 + (isDoor ? (height / 8) : 0)) , Offset(endP.dx, endP.dy - height / 4), paint);
+    //     canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2 - (isDoor ? (height / 8) : 0)) , Offset(endP.dx, endP.dy -  3 * height / 4), paint);
+    //     if(isDoor) {
+    //       canvas.drawLine(Offset(startP.dx + 30, startP.dy + height / 2 + (height / 8)) , Offset(startP.dx + 30, startP.dy + height / 2 - (height / 8)), paint);
+    //     }
+    //     drawHandle(canvas, startP.dx + 30, startP.dy + height / 2, isDoor, false);
+    //     drawLola(canvas, size, endP.dx, endP.dy - height / 4, endP.dy -  3 * height / 4, isDoor);
+    // }
+    //
+    // if(right){
+    //   canvas.drawLine(Offset(startP.dx, startP.dy + height / 4) , Offset(endP.dx- 30, endP.dy - height / 2 - (isDoor ? (height / 8) : 0)), paint);
+    //   canvas.drawLine(Offset(startP.dx, startP.dy + 3 * height / 4) , Offset(endP.dx - 30, endP.dy - height / 2 + (isDoor ? (height / 8) : 0)), paint);
+    //   if(isDoor) {
+    //     canvas.drawLine(Offset(endP.dx- 30, endP.dy - height / 2 - (height / 8)) , Offset(endP.dx - 30, endP.dy - height / 2 + (height / 8)), paint);
+    //   }
+    //   drawHandle(canvas, endP.dx - 30, endP.dy - height / 2, isDoor, true);
+    //   drawLola(canvas, size, startP.dx, startP.dy + height / 4, startP.dy + 3 * height / 4, isDoor);
+    // }
+    //
+    // if(top){
+    //   canvas.drawLine(Offset(endP.dx - width / 2, startP.dy + 30) , Offset(endP.dx - width / 4, endP.dy), paint);
+    //   canvas.drawLine(Offset(endP.dx - width / 2, startP.dy + 30) , Offset(endP.dx - 3 * width / 4, endP.dy), paint);
+    // }
+  }
+
+   void drawHandleAndLolas(Canvas canvas, Size size, bool isVertical, {bool left = false, bool right = false, bool top = false, bool isDoor = false,
       required Offset start, required Offset end}) {
 
     var paint = Paint();
@@ -1007,8 +1134,6 @@ class MyPainter extends CustomPainter {
     var startP = Offset(tlx, tly);
     var endP = Offset(brx, bry);
 
-    drawAroudWith(canvas, Size(width, height), tlx, tly);
-
     paint.color = Colors.blue[900]!;
     paint.strokeWidth = 4;
 
@@ -1037,7 +1162,8 @@ class MyPainter extends CustomPainter {
       canvas.drawLine(Offset(endP.dx - width / 2, startP.dy + 30) , Offset(endP.dx - 3 * width / 4, endP.dy), paint);
     }
   }
-  void drawAroudWith(Canvas canvas, Size size, double x, double y) {
+
+  void drawAroundWith(Canvas canvas, Size size, double x, double y) {
 
     var paint = Paint();
     paint.strokeWidth = 2;
