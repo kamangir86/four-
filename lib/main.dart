@@ -150,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.top, isVertical: false, haveGap: true),
+                    data: Profile(name: ProfileName.top, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/top.png',
                       height: 30,
@@ -164,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.right, isVertical: false, haveGap: true),
+                    data: Profile(name: ProfileName.right, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/right.png',
                       height: 30,
@@ -178,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.topRight, isVertical: false, haveGap: true),
+                    data: Profile(name: ProfileName.topRight, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/topRight.png',
                       height: 30,
@@ -192,7 +192,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.dRight, isVertical: false, haveGap: true),
+                    data: Profile(name: ProfileName.dRight, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/dRight.png',
                       height: 30,
@@ -206,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillV, isVertical: true),
+                    data: Profile(name: ProfileName.fillV, isVertical: true, hasChild: true),
                     feedback: Image.asset(
                       'assets/fillV.png',
                       height: 30,
@@ -257,7 +257,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.left, isVertical: false, haveGap: true),
+                    data: Profile(name: ProfileName.left, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/left.png',
                       height: 30,
@@ -271,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.topLeft, isVertical: false, haveGap: true),
+                    data: Profile(name: ProfileName.topLeft, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/topLeft.png',
                       height: 30,
@@ -285,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                    Draggable<Profile>(
-                    data: Profile(name: ProfileName.dLeft, isVertical: false, haveGap: true),
+                    data: Profile(name: ProfileName.dLeft, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/dLeft.png',
                       height: 30,
@@ -299,7 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillH, isVertical: false),
+                    data: Profile(name: ProfileName.fillH, isVertical: false, hasChild: true),
                     feedback: Image.asset(
                       'assets/fillH.png',
                       height: 30,
@@ -616,14 +616,16 @@ class MyDragTargetDetails<T> {
 
   bool fixed;
   bool changedOffset;
+
+  int? parentIndex;
 }
 
 class Profile {
   ProfileName name;
-  bool haveGap;
   bool isVertical;
+  bool hasChild;
 
-  Profile({required this.name, required this.isVertical, this.haveGap = false});
+  Profile({required this.name, required this.isVertical, this.hasChild = false});
 }
 
 enum ProfileName{

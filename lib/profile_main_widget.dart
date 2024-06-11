@@ -82,8 +82,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         edge = data[i].edge!;
       }
 
-      data[i].edge = edge;
-
       if (data[i].data.name == ProfileName.vertical) {
         var point = (edge.left + (edge.right - edge.left) / 2).ceil();
         if (!data[i].fixed && !data[i].changedOffset) {
@@ -91,6 +89,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].fixed = true;
           data[i].start = Offset(point.toDouble(), edge.top);
           data[i].end = Offset(point.toDouble(), edge.bottom);
+          data[i].edge = edge;
+          data[i].parentIndex = findIndexOfMyParent(edge);
         }
       } else if (data[i].data.name == ProfileName.horizontal) {
         var point = (edge.top + (edge.bottom - edge.top) / 2).ceil();
@@ -100,6 +100,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].fixed = true;
           data[i].start = Offset(edge.left, point.toDouble());
           data[i].end = Offset(edge.right, point.toDouble());
+          data[i].edge = edge;
+          data[i].parentIndex = findIndexOfMyParent(edge);
         }
       }
       if (data[i].data.name == ProfileName.double) {
@@ -114,6 +116,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end2 = Offset(point2.toDouble(), edge.bottom);
           data[i].offset2 = Offset(data[i].start2!.dx, (data[i].end2!.dy - data[i].start2!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
+          data[i].parentIndex = findIndexOfMyParent(edge);
         }
 
       } else
@@ -123,6 +127,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
+          data[i].parentIndex = findIndexOfMyParent(edge);
         }
       } else
       if (data[i].data.name == ProfileName.fillV) {
@@ -131,68 +137,105 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
+          data[i].parentIndex = findIndexOfMyParent(edge);
         }
       } else
       if (data[i].data.name == ProfileName.left) {
         if (!data[i].fixed && !data[i].changedOffset){
+          data[i].parentIndex = findIndexOfMyParent(edge);
+          if(data[i].parentIndex != null){
+            edge = data[data[i].parentIndex!].edge!;
+          }
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
           indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.right) {
         if (!data[i].fixed && !data[i].changedOffset){
+          data[i].parentIndex = findIndexOfMyParent(edge);
+          if(data[i].parentIndex != null){
+            edge = data[data[i].parentIndex!].edge!;
+          }
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
           indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.top) {
         if (!data[i].fixed && !data[i].changedOffset){
+          data[i].parentIndex = findIndexOfMyParent(edge);
+          if(data[i].parentIndex != null){
+            edge = data[data[i].parentIndex!].edge!;
+          }
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
           indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.topRight) {
         if (!data[i].fixed && !data[i].changedOffset){
+          data[i].parentIndex = findIndexOfMyParent(edge);
+          if(data[i].parentIndex != null){
+            edge = data[data[i].parentIndex!].edge!;
+          }
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
           indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.topLeft) {
         if (!data[i].fixed && !data[i].changedOffset){
+          data[i].parentIndex = findIndexOfMyParent(edge);
+          if(data[i].parentIndex != null){
+            edge = data[data[i].parentIndex!].edge!;
+          }
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
           indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.dLeft) {
         if (!data[i].fixed && !data[i].changedOffset){
+          data[i].parentIndex = findIndexOfMyParent(edge);
+          if(data[i].parentIndex != null){
+            edge = data[data[i].parentIndex!].edge!;
+          }
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
           indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else
       if (data[i].data.name == ProfileName.dRight) {
         if (!data[i].fixed && !data[i].changedOffset){
+          data[i].parentIndex = findIndexOfMyParent(edge);
+          if(data[i].parentIndex != null){
+            edge = data[data[i].parentIndex!].edge!;
+          }
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
           data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
           data[i].fixed = true;
+          data[i].edge = edge;
           indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       }
@@ -292,11 +335,6 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     double leftEdge = double.negativeInfinity;
     double rightEdge = double.infinity;
 
-    bool topGap = false;
-    bool bottomGap = false;
-    bool leftGap = false;
-    bool rightGap = false;
-
     List<MyDragTargetDetails<Profile>> lines = List.from(allLines);
     // lines.removeRange(index + 4, lines.length);
     lines.removeLast();
@@ -310,11 +348,9 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       if (startY == endY && (x >= startX && x <= endX)) {
         if (y >= startY && (x >= startX && x <= endX)) {
           bottomEdge = max(bottomEdge, endY);
-          bottomGap = line.data.haveGap;
         }
         if (y <= endY && (x >= startX && x <= endX)) {
           topEdge = min(topEdge, startY);
-          topGap = line.data.haveGap;
         }
       }
 
@@ -322,11 +358,9 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       if (startX == endX && (y >= startY && y <= endY)) {
         if (x >= startX && (y >= startY && y <= endY)) {
           leftEdge = max(leftEdge, startX);
-          leftGap = line.data.haveGap;
         }
         if (x <= endX && (y >= startY && y <= endY)) {
           rightEdge = min(rightEdge, endX);
-          rightGap = line.data.haveGap;
         }
       }
 
@@ -360,8 +394,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     }
 
     return Edge(
-        top: bottomEdge, bottom: topEdge, left: leftEdge, right: rightEdge, topGap: topGap, bottomGap: bottomGap, leftGap: leftGap, rightGap: rightGap,
-    );
+        top: bottomEdge, bottom: topEdge, left: leftEdge, right: rightEdge);
   }
 
   void computeSizeOfSheets(List<MyDragTargetDetails<Profile>> data, Size size) {
@@ -560,10 +593,20 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
     setState(() {});
   }
 
+  int? findIndexOfMyParent(Edge edge) {
+    int? index;
+    for (var i = 0; i < data.length - 1; i++) {
+      if(data[i].data.hasChild && data[i].edge!.right >= edge.right && data[i].edge!.left <= edge.left && data[i].edge!.top <= edge.top && data[i].edge!.bottom >= edge.bottom) {
+        index = i;
+      }
+    }
+    return index;
+  }
+
   int? findIndexOfSameEdge(Edge edge) {
     int? index;
     for (var i = 0; i < data.length - 1; i++) {
-      if(data[i].edge!.right == edge.right && data[i].edge!.left == edge.left && data[i].edge!.top == edge.top && data[i].edge!.bottom == edge.bottom) {
+      if(data[i].data.hasChild && data[i].edge!.right >= edge.right && data[i].edge!.left <= edge.left && data[i].edge!.top <= edge.top && data[i].edge!.bottom >= edge.bottom) {
         index = i;
       }
     }
@@ -571,9 +614,31 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
   }
 
   void removeSameEdgeProfileIfNeeded() {
+    var listOfChildIndex= [];
+
     if(indexOfSameEdge != null){
+      data.last.parentIndex = null;
+      // for(var d = 0; d < data.length-1; d++){
+      //   if(data[d].edge!.left <= data[indexOfSameEdge!].edge!.left &&
+      //   data[d].edge!.right >= data[indexOfSameEdge!].edge!.right &&
+      //   data[d].edge!.bottom >= data[indexOfSameEdge!].edge!.bottom &&
+      //   data[d].edge!.top <= data[indexOfSameEdge!].edge!.top){
+      //     if(d != indexOfSameEdge) {
+      //       listOfChildIndex.add(d);
+      //     }
+      //   }
+      // }
+
+      data.removeWhere((e)=> e.parentIndex == indexOfSameEdge);
       data.removeAt(indexOfSameEdge!);
+
       indexOfSameEdge = null;
+
+      // if(listOfChildIndex.isNotEmpty){
+      //   for (var i in listOfChildIndex) {
+      //     data.removeAt(i);
+      //   }
+      // }
     }
   }
 }
@@ -610,21 +675,21 @@ class MyPainter extends CustomPainter {
       if (data[i].data.name == ProfileName.vertical || data[i].data.name == ProfileName.horizontal) {
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
             start: data[i].start!,
-            end: data[i].end!, edge: data[i].edge!);
+            end: data[i].end!);
       } else
       if (data[i].data.name == ProfileName.double) {
           drawSplitter(canvas, paint, data[i].data.isVertical, size,
-              start: data[i].start!, end: data[i].end!, edge: data[i].edge!);
+              start: data[i].start!, end: data[i].end!);
 
         drawSplitter(canvas, paint, data[i].data.isVertical, size,
-            start: data[i].start2!, end: data[i].end2!, edge: data[i].edge!);
+            start: data[i].start2!, end: data[i].end2!);
 
       } else
       if (data[i].data.name == ProfileName.fillH) {
-        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!, edge: data[i].edge!);
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
       } else
       if (data[i].data.name == ProfileName.fillV) {
-        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!, edge: data[i].edge!);
+        drawFill(canvas, size,  data[i].data.isVertical, start: data[i].start!, end: data[i].end!);
       } else
       if (data[i].data.name == ProfileName.left) {
         drawOpenTo(canvas, size, data[i].data.isVertical, left: true, start: data[i].start!, end: data[i].end!);
@@ -691,7 +756,7 @@ class MyPainter extends CustomPainter {
   }
 
   void drawSplitter(Canvas canvas, Paint paint, bool isVertical, Size size,
-      {required Offset start, required Offset end, required Edge edge}) {
+      {required Offset start, required Offset end}) {
     paint.style = PaintingStyle.stroke;
     paint.color = Colors.black;
 
@@ -717,8 +782,8 @@ class MyPainter extends CustomPainter {
         bottomEdge = false;
       }
 
-      var vp1 = Offset((start.dx - z1 / 2), start.dy + (topEdg ? z1 : z1 / 2) + (edge.topGap ? z1 /3 : 0));
-      var vp2 = Offset((start.dx + z1 / 2), start.dy + (topEdg ? z1 : z1 / 2) + (edge.topGap ? z1 /3 : 0));
+      var vp1 = Offset((start.dx - z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
+      var vp2 = Offset((start.dx + z1 / 2), start.dy + (topEdg ? z1 : z1 / 2));
       var vp3 = Offset((start.dx + (z2 - (z1 / 2))),
           start.dy + (z2 - (topEdg ? 0 : z1 / 2)));
       var vp4 = Offset((end.dx + (z2 - (z1 / 2))),
@@ -820,7 +885,7 @@ class MyPainter extends CustomPainter {
   }
 
   void drawFill(Canvas canvas, Size size, bool isVertical,
-      {required Offset start, required Offset end, required  Edge edge}) {
+      {required Offset start, required Offset end}) {
 
     var fillSheetWidth = 70;
 
