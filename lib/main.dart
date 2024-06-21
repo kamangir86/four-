@@ -206,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillV, isVertical: true, hasChild: true),
+                    data: Profile(name: ProfileName.fillV, isVertical: true, hasChild: false, fillEleman: true),
                     feedback: Image.asset(
                       'assets/fillV.png',
                       height: 30,
@@ -299,7 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillH, isVertical: false, hasChild: true),
+                    data: Profile(name: ProfileName.fillH, isVertical: false, hasChild: false, fillEleman: true),
                     feedback: Image.asset(
                       'assets/fillH.png',
                       height: 30,
@@ -624,8 +624,9 @@ class Profile {
   ProfileName name;
   bool isVertical;
   bool hasChild;
+  bool fillEleman;
 
-  Profile({required this.name, required this.isVertical, this.hasChild = false});
+  Profile({required this.name, required this.isVertical, this.hasChild = false, this.fillEleman = false});
 }
 
 enum ProfileName{

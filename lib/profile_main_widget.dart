@@ -91,6 +91,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(point.toDouble(), edge.bottom);
           data[i].edge = edge;
           data[i].parentIndex = findIndexOfMyParent(edge);
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       } else if (data[i].data.name == ProfileName.horizontal) {
         var point = (edge.top + (edge.bottom - edge.top) / 2).ceil();
@@ -102,6 +103,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].end = Offset(edge.right, point.toDouble());
           data[i].edge = edge;
           data[i].parentIndex = findIndexOfMyParent(edge);
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
       }
       if (data[i].data.name == ProfileName.double) {
@@ -118,6 +120,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
           data[i].fixed = true;
           data[i].edge = edge;
           data[i].parentIndex = findIndexOfMyParent(edge);
+          indexOfSameEdge = findIndexOfSameEdge(edge);
         }
 
       } else
@@ -606,7 +609,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
   int? findIndexOfSameEdge(Edge edge) {
     int? index;
     for (var i = 0; i < data.length - 1; i++) {
-      if(data[i].data.hasChild && data[i].edge!.right >= edge.right && data[i].edge!.left <= edge.left && data[i].edge!.top <= edge.top && data[i].edge!.bottom >= edge.bottom) {
+      if((data[i].data.hasChild || data[i].data.fillEleman) && data[i].edge!.right >= edge.right && data[i].edge!.left <= edge.left && data[i].edge!.top <= edge.top && data[i].edge!.bottom >= edge.bottom) {
         index = i;
       }
     }
@@ -615,7 +618,16 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
 
   void removeSameEdgeProfileIfNeeded() {
 
-    if(indexOfSameEdge != null){
+    if(indexOfSameEdge != null && ((data.last.data.name == ProfileName.horizontal ||data.last.data.name == ProfileName.vertical ||data.last.data.name == ProfileName.double) && data[indexOfSameEdge!].data.fillEleman)){
+      data.last.parentIndex = data[indexOfSameEdge!].parentIndex;
+
+      data.removeWhere((e)=> e.parentIndex == indexOfSameEdge);
+      data.removeAt(indexOfSameEdge!);
+
+      indexOfSameEdge = null;
+    }
+
+    if(indexOfSameEdge != null && ((data.last.data.name != ProfileName.horizontal && data.last.data.name != ProfileName.vertical && data.last.data.name != ProfileName.double) && !data.last.data.fillEleman)){
       data.last.parentIndex = null;
 
       data.removeWhere((e)=> e.parentIndex == indexOfSameEdge);
