@@ -128,7 +128,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         if (!data[i].fixed && !data[i].changedOffset){
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
-          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
           data[i].fixed = true;
           data[i].edge = edge;
           data[i].parentIndex = findIndexOfMyParent(edge);
@@ -138,7 +138,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
         if (!data[i].fixed && !data[i].changedOffset){
           data[i].start = Offset(edge.left, edge.top);
           data[i].end = Offset(edge.right, edge.bottom);
-          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + (data[i].end!.dy - data[i].start!.dy) / 2);
+          data[i].offset = Offset(data[i].start!.dx + ((data[i].end!.dx - data[i].start!.dx) / 2), data[i].start!.dy + ((data[i].end!.dy - data[i].start!.dy) / 2));
           data[i].fixed = true;
           data[i].edge = edge;
           data[i].parentIndex = findIndexOfMyParent(edge);
@@ -497,7 +497,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       }
 
       for (int i = 0; i < data.length; i++) {
-        if (!data[i].data.isVertical) {
+        if (!data[i].data.isVertical && data[i].data.splitter) {
           if (data[i].start!.dy == sum) {
             data[i].start =
                 Offset(data[i].start!.dx, remainingValue.toDouble());
@@ -509,7 +509,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
             data[i].changedOffset = true;
           }
         }
-        if (data[i].data.isVertical) {
+        if (data[i].data.isVertical || !data[i].data.splitter) {
           if (data[i].start!.dy == sum) {
             data[i].start =
                 Offset(data[i].start!.dx, remainingValue.toDouble());
@@ -549,8 +549,8 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
       }
 
       for (int i = 0; i < data.length; i++) {
-        if (data[i].data.isVertical) {
-          if (data[i].start!.dx == sum) {
+        if (data[i].data.isVertical && data[i].data.splitter) {
+          if (data[i].start!.dx == sum ) {
             data[i].start =
                 Offset(remainingValue.toDouble(), data[i].start!.dy);
             data[i].end = Offset(remainingValue.toDouble(), data[i].end!.dy);
@@ -561,7 +561,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
             data[i].changedOffset = true;
           }
 
-          if (data[i].offset2 != null && data[i].start2!.dx == sum) {
+          if (data[i].offset2 != null && data[i].start2!.dx == sum && data[i].data.splitter) {
             data[i].start2 =
                 Offset(remainingValue.toDouble(), data[i].start2!.dy);
             data[i].end2 = Offset(remainingValue.toDouble(), data[i].end2!.dy);
@@ -572,7 +572,7 @@ class _ProfileMainWidgetState extends State<ProfileMainWidget> {
             data[i].changedOffset = true;
           }
         }
-        if (!data[i].data.isVertical) {
+        if (!data[i].data.isVertical || !data[i].data.splitter) {
           if (data[i].start!.dx == sum) {
 
             data[i].start =

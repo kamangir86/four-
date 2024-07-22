@@ -136,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.double, isVertical: true),
+                    data: Profile(name: ProfileName.double, isVertical: true, splitter: true),
                     feedback: Image.asset(
                       'assets/double.png',
                       height: 30,
@@ -229,7 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.vertical, isVertical: true),
+                    data: Profile(name: ProfileName.vertical, isVertical: true, splitter: true),
                     feedback: Image.asset(
                       'assets/vertical.png',
                       height: 30,
@@ -243,7 +243,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.horizontal, isVertical: false),
+                    data: Profile(name: ProfileName.horizontal, isVertical: false, splitter: true),
                     feedback: Image.asset(
                       'assets/horizontal.png',
                       height: 30,
@@ -625,8 +625,9 @@ class Profile {
   bool isVertical;
   bool hasChild;
   bool fillEleman;
+  bool splitter;
 
-  Profile({required this.name, required this.isVertical, this.hasChild = false, this.fillEleman = false});
+  Profile({required this.name, required this.isVertical, this.hasChild = false, this.fillEleman = false, this.splitter = false});
 }
 
 enum ProfileName{
