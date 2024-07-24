@@ -11,7 +11,7 @@ ValueNotifier<List<double>> horizontalSheetsSize =
     ValueNotifier<List<double>>([]);
 GlobalKey key = GlobalKey();
 
-class ProfileDrawingWidget extends StatelessWidget {
+class ProfileDrawingWidget extends StatefulWidget {
     ProfileDrawingWidget(
       {required this.size, this.initialProfileList, required this.onAddNewProfile, super.key});
 
@@ -19,7 +19,12 @@ class ProfileDrawingWidget extends StatelessWidget {
   List<MyDragTargetDetails<Profile>>? initialProfileList;
     final Function(List<MyDragTargetDetails<Profile>> newList) onAddNewProfile;
 
+  @override
+  State<ProfileDrawingWidget> createState() => _ProfileDrawingWidgetState();
+}
 
+class _ProfileDrawingWidgetState extends State<ProfileDrawingWidget> {
+  List<MyDragTargetDetails<Profile>> myList = [];
   List<MyDragTargetDetails<Profile>> data = [];
 
   var sizeOfSizeWidget = 300.0;
@@ -29,47 +34,45 @@ class ProfileDrawingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var availableWidth = MediaQuery.sizeOf(context).width;
-    var availableHeight = MediaQuery.sizeOf(context).height / 2 - 244;
+    var availableHeight = MediaQuery.sizeOf(context).height - 244;
 
-    data = initialProfileList ?? [];
+    data = myList;
     List<MyDragTargetDetails<Profile>> dataCopy = List.from(data);
 
-
-      dataCopy.insertAll(0, [
+    dataCopy.insertAll(0, [
       MyDragTargetDetails<Profile>(
         data: Profile(name: ProfileName.edge, isVertical: false),
-        offset: Offset(size.width / 2, 0),
+        offset: Offset(widget.size.width / 2, 0),
         fixed: true,
         changedOffset: false,
         start: const Offset(0, 0),
-        end: Offset(size.width, 0),
+        end: Offset(widget.size.width, 0),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: ProfileName.edge, isVertical: false),
-        offset: Offset(size.width / 2, size.height),
+        offset: Offset(widget.size.width / 2, widget.size.height),
         fixed: true,
         changedOffset: false,
-        start: Offset(0, size.height),
-        end: Offset(size.width, size.height),
+        start: Offset(0, widget.size.height),
+        end: Offset(widget.size.width, widget.size.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: ProfileName.edge, isVertical: true),
-        offset: Offset(size.width / 2, 0),
+        offset: Offset(widget.size.width / 2, 0),
         fixed: true,
         changedOffset: false,
         start: const Offset(0, 0),
-        end: Offset(0, size.height),
+        end: Offset(0, widget.size.height),
       ),
       MyDragTargetDetails<Profile>(
         data: Profile(name: ProfileName.edge, isVertical: true),
-        offset: Offset(size.width / 2, 0),
+        offset: Offset(widget.size.width / 2, 0),
         fixed: true,
         changedOffset: false,
-        start: Offset(size.width, 0),
-        end: Offset(size.width, size.height),
+        start: Offset(widget.size.width, 0),
+        end: Offset(widget.size.width, widget.size.height),
       ),
     ]);
-
 
     for (var i = 0; i < data.length; i++) {
       Edge edge;
@@ -242,7 +245,7 @@ class ProfileDrawingWidget extends StatelessWidget {
     }
 
     removeSameEdgeProfileIfNeeded();
-    computeSizeOfSheets(data, Size(size.width, size.height));
+    computeSizeOfSheets(data, Size(widget.size.width, widget.size.height));
 
     return Container(
       color: Colors.transparent,
@@ -263,7 +266,7 @@ class ProfileDrawingWidget extends StatelessWidget {
                 builder: (BuildContext context, value, Widget? child) {
                   print(value);
                   return VerticalSize(
-                    height: size.height,
+                    height: widget.size.height,
                     splits: value, // [25, 25, 25, 25],
                     onChangeSize: (int newValue, int index) {
                       changeSizeOfSheet(index, newValue,
@@ -281,15 +284,15 @@ class ProfileDrawingWidget extends StatelessWidget {
                   children: [
                     CustomPaint(
                       key: key,
-                      painter: MyPainter(data: data),
-                      size: Size(size.width, size.height),
+                      painter: MyPainter(data: myList),
+                      size: Size(widget.size.width, widget.size.height),
                     ),
                     MyDragTaget<Profile>(
-                      size: Size(size.width, size.height),
+                      size: Size(widget.size.width, widget.size.height),
                       onAcceptWithDetails: (d) {
-                        data.add(d);
-                        onAddNewProfile(data);
-                        // setState(() {});
+                        myList.add(d);
+                        widget.onAddNewProfile(myList);
+                        setState(() {});
                       },
                     ),
                   ],
@@ -303,7 +306,7 @@ class ProfileDrawingWidget extends StatelessWidget {
                       print(value);
 
                       return HorizontalSize(
-                        width: size.width,
+                        width: widget.size.width,
                         splits: value, // [150, 75,75],
                         onChangeSize: (int newValue, int index) {
                           changeSizeOfSheet(
@@ -590,6 +593,8 @@ class ProfileDrawingWidget extends StatelessWidget {
         }
       }
     }
+
+    setState(() {});
   }
 
   int? findIndexOfMyParent(Edge edge) {
