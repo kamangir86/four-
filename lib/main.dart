@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:fourplus/profile_main_widget.dart';
+import 'package:fourplus/profile_drawing_widget.dart';
+import 'package:fourplus/profile_drawing_widget2.dart';
+import 'package:fourplus/profile_preview_widget.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 
 void main() {
@@ -90,6 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool haveSize = false;
   Size size = Size(0,0);
 
+  List<MyDragTargetDetails<Profile>>? list;
+
 
   @override
   Widget build(BuildContext context) {
@@ -129,196 +133,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            Container(
-              height: 60,
-              color: Colors.grey,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.double, isVertical: true, splitter: true),
-                    feedback: Image.asset(
-                      'assets/double.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/double.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.top, isVertical: false, hasChild: true),
-                    feedback: Image.asset(
-                      'assets/top.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/top.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.right, isVertical: false, hasChild: true),
-                    feedback: Image.asset(
-                      'assets/right.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/right.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.topRight, isVertical: false, hasChild: true),
-                    feedback: Image.asset(
-                      'assets/topRight.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/topRight.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.dRight, isVertical: false, hasChild: true),
-                    feedback: Image.asset(
-                      'assets/dRight.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/dRight.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillV, isVertical: true, hasChild: false, fillEleman: true),
-                    feedback: Image.asset(
-                      'assets/fillV.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/fillV.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              height: 60,
-              color: Colors.grey,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.vertical, isVertical: true, splitter: true),
-                    feedback: Image.asset(
-                      'assets/vertical.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/vertical.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.horizontal, isVertical: false, splitter: true),
-                    feedback: Image.asset(
-                      'assets/horizontal.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/horizontal.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.left, isVertical: false, hasChild: true),
-                    feedback: Image.asset(
-                      'assets/left.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/left.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.topLeft, isVertical: false, hasChild: true),
-                    feedback: Image.asset(
-                      'assets/topLeft.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/topLeft.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                   Draggable<Profile>(
-                    data: Profile(name: ProfileName.dLeft, isVertical: false, hasChild: true),
-                    feedback: Image.asset(
-                      'assets/dLeft.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/dLeft.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
-                  Draggable<Profile>(
-                    data: Profile(name: ProfileName.fillH, isVertical: false, hasChild: false, fillEleman: true),
-                    feedback: Image.asset(
-                      'assets/fillH.png',
-                      height: 30,
-                    ),
-                    child: ElemanWidget(
-                      child: Image.asset(
-                        'assets/fillH.png',
-                        height: 30,
-                        width: 30,
-                      ),
-                    ),
-                  ),
+            ProfileDrawingWidget2(size: size,
+                initialProfileList: list,
+                onAddNewProfile: (List<MyDragTargetDetails<Profile>> newList){
 
-                ],
-              ),
+                }
             ),
-            TargetWidget(
-              type: 1,
-              size: size,
+            WindowWidget(size: size,
+                initialProfileList: list,
+                onAddNewProfile: (List<MyDragTargetDetails<Profile>> newList){
+                  list = newList;
+                  setState(() {
+
+                  });
+                }
             ),
           ],
         ),
@@ -327,28 +155,212 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class TargetWidget extends StatefulWidget {
-  const TargetWidget({required this.type, required this.size, super.key});
-
+class WindowWidget extends StatelessWidget {
+  WindowWidget({required this.size, this.initialProfileList, required this.onAddNewProfile, super.key});
   final Size size;
-  final int type;
-
-  @override
-  State<TargetWidget> createState() => _TargetWidgetState();
-}
-
-class _TargetWidgetState extends State<TargetWidget> {
-  // List<MyDragTargetDetails<Profile>> myList = [];
+  final List<MyDragTargetDetails<Profile>>? initialProfileList;
+  final Function(List<MyDragTargetDetails<Profile>> newList) onAddNewProfile;
 
   @override
   Widget build(BuildContext context) {
-    // var myList = [
-    //   Profile(name: "1", dx: 0, dy: 0, isVertical: true,),
-    //   Profile(name: "1", dx: widget.size.width /2, dy: 50, isVertical: false,),
-    // ];
+    return Column(
+      children: [
+        Container(
+          height: 60,
+          color: Colors.grey,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.double, isVertical: true, splitter: true),
+                feedback: Image.asset(
+                  'assets/double.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/double.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.top, isVertical: false, hasChild: true),
+                feedback: Image.asset(
+                  'assets/top.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/top.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.right, isVertical: false, hasChild: true),
+                feedback: Image.asset(
+                  'assets/right.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/right.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.topRight, isVertical: false, hasChild: true),
+                feedback: Image.asset(
+                  'assets/topRight.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/topRight.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.dRight, isVertical: false, hasChild: true),
+                feedback: Image.asset(
+                  'assets/dRight.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/dRight.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.fillV, isVertical: true, hasChild: false, fillEleman: true),
+                feedback: Image.asset(
+                  'assets/fillV.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/fillV.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          height: 60,
+          color: Colors.grey,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.vertical, isVertical: true, splitter: true),
+                feedback: Image.asset(
+                  'assets/vertical.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/vertical.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.horizontal, isVertical: false, splitter: true),
+                feedback: Image.asset(
+                  'assets/horizontal.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/horizontal.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.left, isVertical: false, hasChild: true),
+                feedback: Image.asset(
+                  'assets/left.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/left.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.topLeft, isVertical: false, hasChild: true),
+                feedback: Image.asset(
+                  'assets/topLeft.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/topLeft.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.dLeft, isVertical: false, hasChild: true),
+                feedback: Image.asset(
+                  'assets/dLeft.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/dLeft.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
+              Draggable<Profile>(
+                data: Profile(name: ProfileName.fillH, isVertical: false, hasChild: false, fillEleman: true),
+                feedback: Image.asset(
+                  'assets/fillH.png',
+                  height: 30,
+                ),
+                child: ElemanWidget(
+                  child: Image.asset(
+                    'assets/fillH.png',
+                    height: 30,
+                    width: 30,
+                  ),
+                ),
+              ),
 
-    return ProfileMainWidget(
-        width: widget.size.width, height: widget.size.height);
+            ],
+          ),
+        ),
+        ProfileDrawingWidget(
+          size: size,
+          initialProfileList: initialProfileList,
+          onAddNewProfile: (List<MyDragTargetDetails<Profile>> newList){
+            onAddNewProfile(newList);
+          }
+        ),
+      ],
+    );
   }
 }
 
